@@ -1,0 +1,138 @@
+/* Body & Background */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+  color: white;
+}
+.glow-bg {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  background: rgba(0, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(150px);
+  transform: translate(-50%, -50%);
+  animation: pulse 6s infinite ease-in-out;
+  z-index: -1;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 1; }
+  50% { transform: scale(1.2) translate(-50%, -50%); opacity: 0.6; }
+}
+
+/* Container */
+.notifications-container {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 30px;
+  text-align: center;
+}
+.notifications-container h1 {
+  font-size: 2em;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 30px;
+}
+
+/* Notification Cards */
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  text-align: left;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+  transition: 0.3s;
+}
+.notification-card.unread {
+  border-left: 4px solid cyan;
+  background: rgba(0, 255, 255, 0.07);
+}
+.icon {
+  font-size: 1.8em;
+}
+.content p {
+  margin: 0 0 8px;
+  font-size: 1em;
+  color: white;
+}
+.content small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85em;
+}
+
+/* Back Button */
+.back-btn {
+  margin-top: 30px;
+  padding: 10px 25px;
+  border-radius: 25px;
+  background: rgba(0, 255, 255, 0.1);
+  border: none;
+  color: cyan;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.back-btn:hover {
+  background: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+}
+
+/* Floating Profile Menu */
+.profile-icon {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-image: url('https://www.w3schools.com/howto/img_avatar.png');
+  background-size: cover;
+  background-position: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  cursor: pointer;
+  z-index: 10;
+}
+.profile-menu {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  padding: 10px;
+  display: none;
+  z-index: 10;
+}
+.profile-menu a {
+  display: block;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.profile-menu a:hover {
+  color: #00c6ff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .notifications-container {
+    padding: 20px;
+  }
+  .notification-card {
+    flex-direction: column;
+  }
+  .icon {
+    align-self: flex-start;
+  }
+}

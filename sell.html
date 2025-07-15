@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Crew - Sell Product</title>
+  <link rel="stylesheet" href="sell.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html" class="active"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="sell-container">
+    <div class="sell-header">
+      <h1>Sell Your Product</h1>
+      <p>Fill out the form below to list your item for sale</p>
+    </div>
+
+    <form class="sell-form">
+      <div class="form-group">
+        <label for="product-name">Product Name</label>
+        <input type="text" id="product-name" placeholder="e.g. Scientific Calculator, Hostel Chair" required>
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+        <select id="category" required>
+          <option value="" disabled selected>Select a category</option>
+          <option value="stationery">Stationery</option>
+          <option value="textbooks">Textbooks</option>
+          <option value="electronics">Electronics</option>
+          <option value="hostel">Hostel Essentials</option>
+          <option value="others">Others</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price (₹)</label>
+        <input type="number" id="price" placeholder="Enter price in rupees" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" rows="4" placeholder="Describe your product in detail (condition, features, etc.)" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <div class="location-fields">
+          <input type="text" id="block" placeholder="Block (e.g. C-Block)" required>
+          <input type="text" id="room" placeholder="Room No." required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Product Images</label>
+        <div class="image-upload">
+          <div class="upload-box" id="upload-box">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Click to upload images</p>
+            <input type="file" id="image-upload" accept="image/*" multiple style="display: none;">
+          </div>
+          <div class="preview-grid" id="preview-grid"></div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          <i class="fas fa-check-circle"></i> List Product
+        </button>
+        <button type="button" class="btn-secondary" onclick="window.history.back()">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Image upload preview
+    const uploadBox = document.getElementById('upload-box');
+    const imageUpload = document.getElementById('image-upload');
+    const previewGrid = document.getElementById('preview-grid');
+
+    uploadBox.addEventListener('click', function() {
+      imageUpload.click();
+    });
+
+    imageUpload.addEventListener('change', function(e) {
+      const files = e.target.files;
+      previewGrid.innerHTML = '';
+
+      if (files.length > 0) {
+        uploadBox.style.display = 'none';
+        
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          
+          reader.onload = function(event) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.innerHTML = `
+              <img src="${event.target.result}" alt="Preview">
+              <button class="remove-btn" data-index="${i}">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+            previewGrid.appendChild(previewItem);
+          }
+          
+          reader.readAsDataURL(file);
+        }
+      } else {
+        uploadBox.style.display = 'flex';
+      }
+    });
+
+    // Remove image
+    previewGrid.addEventListener('click', function(e) {
+      if (e.target.closest('.remove-btn')) {
+        const index = e.target.closest('.remove-btn').getAttribute('data-index');
+        const files = Array.from(imageUpload.files);
+        files.splice(index, 1);
+        
+        // Create new FileList (simulated)
+        const dataTransfer = new DataTransfer();
+        files.forEach(file => dataTransfer.items.add(file));
+        imageUpload.files = dataTransfer.files;
+        
+        // Trigger change event to update preview
+        const event = new Event('change');
+        imageUpload.dispatchEvent(event);
+      }
+    });
+
+    // Form submission
+    const sellForm = document.querySelector('.sell-form');
+    sellForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Add your form submission logic here
+      alert('Product listed successfully!');
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>

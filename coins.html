@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coins - Student Crew</title>
+  <link rel="stylesheet" href="coins.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html" class="active"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="coins-container">
+    <section class="coins-header">
+      <div class="coins-balance">
+        <h1><i class="fas fa-coins"></i> Your Coin Balance</h1>
+        <div class="balance-amount">120</div>
+        <p>Use coins to boost your listings and unlock premium features</p>
+      </div>
+      <button class="btn-earn"><i class="fas fa-plus-circle"></i> Earn More Coins</button>
+    </section>
+
+    <div class="coins-content">
+      <section class="coins-section">
+        <div class="section-header">
+          <h2><i class="fas fa-gift"></i> How to Earn Coins</h2>
+          <div class="section-icon">
+            <i class="fas fa-hand-holding-usd"></i>
+          </div>
+        </div>
+        <div class="earn-grid">
+          <div class="earn-card">
+            <div class="earn-icon invite">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <h3>Invite Friends</h3>
+            <p>Get 10 coins for each friend who joins</p>
+            <span class="earn-amount">+10 coins</span>
+          </div>
+          <div class="earn-card">
+            <div class="earn-icon sell">
+              <i class="fas fa-tag"></i>
+            </div>
+            <h3>Sell Items</h3>
+            <p>Earn 5 coins for each successful sale</p>
+            <span class="earn-amount">+5 coins</span>
+          </div>
+          <div class="earn-card">
+            <div class="earn-icon feedback">
+              <i class="fas fa-star"></i>
+            </div>
+            <h3>Positive Feedback</h3>
+            <p>Get 3 coins for each 5-star rating</p>
+            <span class="earn-amount">+3 coins</span>
+          </div>
+          <div class="earn-card">
+            <div class="earn-icon daily">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <h3>Daily Login</h3>
+            <p>Collect 1 coin for logging in daily</p>
+            <span class="earn-amount">+1 coin</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="coins-section">
+        <div class="section-header">
+          <h2><i class="fas fa-rocket"></i> How to Use Coins</h2>
+          <div class="section-icon">
+            <i class="fas fa-bolt"></i>
+          </div>
+        </div>
+        <div class="use-grid">
+          <div class="use-card">
+            <div class="use-icon boost">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div class="use-details">
+              <h3>Boost Listing</h3>
+              <p>Make your listing appear at the top of search results for 48 hours</p>
+              <div class="use-cost">20 coins</div>
+            </div>
+          </div>
+          <div class="use-card">
+            <div class="use-icon highlight">
+              <i class="fas fa-certificate"></i>
+            </div>
+            <div class="use-details">
+              <h3>Highlight Item</h3>
+              <p>Make your listing stand out with a special border and glow effect</p>
+              <div class="use-cost">15 coins</div>
+            </div>
+          </div>
+          <div class="use-card">
+            <div class="use-icon category">
+              <i class="fas fa-unlock"></i>
+            </div>
+            <div class="use-details">
+              <h3>Unlock Categories</h3>
+              <p>Access premium categories with high-demand items</p>
+              <div class="use-cost">30 coins</div>
+            </div>
+          </div>
+          <div class="use-card">
+            <div class="use-icon badge">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="use-details">
+              <h3>Verified Badge</h3>
+              <p>Get a verified badge to build trust with buyers</p>
+              <div class="use-cost">50 coins</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="coins-section">
+        <div class="section-header">
+          <h2><i class="fas fa-info-circle"></i> Important Information</h2>
+          <div class="section-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-item">
+            <i class="fas fa-exchange-alt"></i>
+            <p>Coins are non-transferable between accounts</p>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-calendar-times"></i>
+            <p>Coins expire after 6 months of inactivity</p>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-ban"></i>
+            <p>Abuse of the coin system may result in suspension</p>
+          </div>
+          <div class="info-item">
+            <i class="fas fa-question-circle"></i>
+            <p>Contact support for any coin-related issues</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

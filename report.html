@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report an Issue - Student Crew</title>
+  <link rel="stylesheet" href="report.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <!-- Update this in all HTML files (dashboard.html, terms.html, report.html) -->
+<div class="profile-menu" id="profileMenu">
+  <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+  <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+  <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+  <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+  <div class="divider"></div>
+  <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+  <a href="report.html"><i class="fas fa-bug"></i> Report Issue</a>
+  <div class="divider"></div>
+  <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+    </div>
+  </nav>
+
+  <main class="report-container">
+    <div class="report-header">
+      <h1><i class="fas fa-bug"></i> Report an Issue</h1>
+      <p>Help us improve Student Crew by reporting any problems you encounter</p>
+    </div>
+
+    <form class="report-form">
+      <div class="form-group">
+        <label for="issue-type">
+          <i class="fas fa-tag"></i> Issue Type
+        </label>
+        <select id="issue-type" required>
+          <option value="">Select issue type</option>
+          <option value="bug">Bug Report</option>
+          <option value="content">Inappropriate Content</option>
+          <option value="user">User Behavior</option>
+          <option value="suggestion">Feature Suggestion</option>
+          <option value="other">Other Issue</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="title">
+          <i class="fas fa-heading"></i> Title
+        </label>
+        <input type="text" id="title" placeholder="Briefly describe the issue" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description">
+          <i class="fas fa-align-left"></i> Description
+        </label>
+        <textarea id="description" rows="6" placeholder="Please provide detailed information about the issue..." required></textarea>
+        <div class="hint">Be as specific as possible. Include steps to reproduce if reporting a bug.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="url">
+          <i class="fas fa-link"></i> Page URL (if applicable)
+        </label>
+        <input type="url" id="url" placeholder="https://">
+      </div>
+
+      <div class="form-group">
+        <label>
+          <i class="fas fa-image"></i> Screenshot (Optional)
+        </label>
+        <div class="file-upload">
+          <input type="file" id="screenshot" accept="image/*">
+          <label for="screenshot" class="upload-btn">
+            <i class="fas fa-cloud-upload-alt"></i> Choose File
+          </label>
+          <span class="file-name">No file selected</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="contact">
+          <i class="fas fa-envelope"></i> Contact Email (Optional)
+        </label>
+        <input type="email" id="contact" placeholder="Your email if you'd like a response">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-paper-plane"></i> Submit Report
+        </button>
+        <button type="reset" class="btn-reset">
+          <i class="fas fa-undo"></i> Reset Form
+        </button>
+      </div>
+    </form>
+
+    <div class="report-info">
+      <div class="info-card">
+        <i class="fas fa-clock"></i>
+        <h3>Response Time</h3>
+        <p>We typically respond to reports within 24-48 hours</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Confidentiality</h3>
+        <p>Your report will be handled with strict confidentiality</p>
+      </div>
+      <div class="info-card">
+        <i class="fas fa-thumbs-up"></i>
+        <h3>Thank You</h3>
+        <p>Your feedback helps improve Student Crew for everyone</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // File upload display
+    const fileInput = document.getElementById('screenshot');
+    const fileName = document.querySelector('.file-name');
+    
+    fileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+      } else {
+        fileName.textContent = 'No file selected';
+      }
+    });
+
+    // Form submission
+    const form = document.querySelector('.report-form');
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Here you would typically send the form data to your server
+      alert('Thank you for your report! We will review it shortly.');
+      form.reset();
+      fileName.textContent = 'No file selected';
+    });
+  </script>
+</body>
+</html>

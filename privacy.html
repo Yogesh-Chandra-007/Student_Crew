@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy Policy - Student Crew</title>
+  <link rel="stylesheet" href="privacy.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <!-- Profile Icon -->
+  <div class="profile-icon" onclick="toggleProfileMenu()"></div>
+  <div class="profile-menu" id="profileMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="settings.html">Settings</a>
+    <a href="friends.html">Friends</a>
+    <a href="coins.html">Coins</a>
+    <a href="login.html">Logout</a>
+  </div>
+
+  <div class="privacy-container">
+    <h1>🔒 Privacy Policy</h1>
+
+    <section>
+      <h2>1. Information We Collect</h2>
+      <p>We collect your name, email, phone number, college info, and items listed for trade. This helps personalize your experience.</p>
+    </section>
+
+    <section>
+      <h2>2. How We Use Information</h2>
+      <p>Your data helps us connect you with buyers/sellers, notify you of chats or updates, and keep our platform safe.</p>
+    </section>
+
+    <section>
+      <h2>3. Data Sharing</h2>
+      <p>We never sell your data. We only share minimal data (like email or phone) when needed to complete trades.</p>
+    </section>
+
+    <section>
+      <h2>4. Security</h2>
+      <p>Your data is stored securely using encryption and access controls. Only authorized staff can access it.</p>
+    </section>
+
+    <section>
+      <h2>5. Your Rights</h2>
+      <p>You may request your data be corrected or deleted at any time by contacting our support team.</p>
+    </section>
+
+    <section>
+      <h2>6. Cookies</h2>
+      <p>We may use cookies to improve your experience, but we keep them minimal and transparent.</p>
+    </section>
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+  </div>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    window.onclick = function (e) {
+      const menu = document.getElementById("profileMenu");
+      const icon = document.querySelector(".profile-icon");
+      if (!menu.contains(e.target) && !icon.contains(e.target)) {
+        menu.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>

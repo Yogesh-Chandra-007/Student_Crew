@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Crew - Profile</title>
+  <link rel="stylesheet" href="profile.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="profile-container">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Picture">
+        <button class="edit-avatar" onclick="document.getElementById('avatar-upload').click()">
+          <i class="fas fa-camera"></i>
+        </button>
+        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+      </div>
+      <div class="profile-info">
+        <h1>John Doe</h1>
+        <p class="college">VVIT College, Guntur</p>
+        <div class="profile-stats">
+          <div class="stat">
+            <span class="number">120</span>
+            <span class="label">Coins</span>
+          </div>
+          <div class="stat">
+            <span class="number">18</span>
+            <span class="label">Friends</span>
+          </div>
+          <div class="stat">
+            <span class="number">8</span>
+            <span class="label">Listings</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-content">
+      <div class="profile-section">
+        <h2 class="section-title">Personal Information</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Email</span>
+            <span class="value">john.doe@example.com</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Phone</span>
+            <span class="value">+91 9876543210</span>
+          </div>
+          <div class="info-item">
+            <span class="label">College</span>
+            <span class="value">VVIT, Guntur</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Course</span>
+            <span class="value">B.Tech Computer Science</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Year</span>
+            <span class="value">3rd Year</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Hostel</span>
+            <span class="value">C-Block, Room 204</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">Recent Activity</h2>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-icon sold">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="activity-details">
+              <p>Sold <strong>Scientific Calculator</strong> for ₹350</p>
+              <span class="activity-time">2 hours ago</span>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon message">
+              <i class="fas fa-comment-dots"></i>
+            </div>
+            <div class="activity-details">
+              <p>New message from <strong>Ananya</strong> about your textbook</p>
+              <span class="activity-time">5 hours ago</span>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon bought">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="activity-details">
+              <p>Purchased <strong>Drafting Set</strong> for ₹500</p>
+              <span class="activity-time">1 day ago</span>
+            </div>
+          </div>
+        </div>
+        <a href="history.html" class="view-all">View All Activity</a>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn-primary" onclick="window.location.href='settings.html'">
+        <i class="fas fa-user-edit"></i> Edit Profile
+      </button>
+      <button class="btn-secondary" onclick="window.history.back()">
+        <i class="fas fa-arrow-left"></i> Back
+      </button>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Avatar upload preview
+    const avatarUpload = document.getElementById('avatar-upload');
+    const avatarImg = document.querySelector('.profile-avatar img');
+    
+    avatarUpload.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          avatarImg.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>

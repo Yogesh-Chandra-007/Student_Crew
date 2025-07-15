@@ -1,0 +1,79 @@
+<!-- Student Crew - Notifications Page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - Student Crew</title>
+  <link rel="stylesheet" href="notifications.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <!-- Profile Icon -->
+  <div class="profile-icon" onclick="toggleProfileMenu()"></div>
+  <div class="profile-menu" id="profileMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="settings.html">Settings</a>
+    <a href="friends.html">Friends</a>
+    <a href="coins.html">Coins</a>
+    <a href="login.html">Logout</a>
+  </div>
+
+  <div class="notifications-container">
+    <h1>🔔 Notifications</h1>
+
+    <div class="notification-card unread">
+      <span class="icon">💬</span>
+      <div class="content">
+        <p><strong>New message from John:</strong> Is the electronics kit still available?</p>
+        <small>Just now</small>
+      </div>
+    </div>
+
+    <div class="notification-card">
+      <span class="icon">✅</span>
+      <div class="content">
+        <p><strong>Sale confirmed:</strong> You sold a drafter for ₹200.</p>
+        <small>10 min ago</small>
+      </div>
+    </div>
+
+    <div class="notification-card unread">
+      <span class="icon">⚠️</span>
+      <div class="content">
+        <p><strong>Profile Alert:</strong> Your profile is missing college information.</p>
+        <small>1 hour ago</small>
+      </div>
+    </div>
+
+    <div class="notification-card">
+      <span class="icon">📦</span>
+      <div class="content">
+        <p><strong>Listing Updated:</strong> Hostel Mattress marked as sold.</p>
+        <small>Yesterday</small>
+      </div>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+  </div>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    window.onclick = function (e) {
+      const menu = document.getElementById("profileMenu");
+      const icon = document.querySelector(".profile-icon");
+      if (!menu.contains(e.target) && !icon.contains(e.target)) {
+        menu.style.display = "none";
+      }
+    };
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Listings - Student Crew</title>
+  <link rel="stylesheet" href="listings.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html" class="active"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="listings-container">
+    <div class="listings-header">
+      <h1>My Listings</h1>
+      <p>Manage your products listed for sale</p>
+    </div>
+
+    <div class="listings-actions">
+      <div class="search-filter">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search your listings...">
+        </div>
+        <select class="status-filter">
+          <option value="all">All Statuses</option>
+          <option value="available">Available</option>
+          <option value="pending">Pending</option>
+          <option value="sold">Sold</option>
+        </select>
+      </div>
+      <button class="btn-primary" onclick="window.location.href='sell.html'">
+        <i class="fas fa-plus"></i> Add New Listing
+      </button>
+    </div>
+
+    <div class="listings-grid">
+      <div class="listing-card">
+        <div class="listing-badge available">Available</div>
+        <div class="listing-image">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Scientific Calculator">
+          <div class="image-count"><i class="fas fa-camera"></i> 3</div>
+        </div>
+        <div class="listing-info">
+          <h3>Scientific Calculator</h3>
+          <div class="listing-meta">
+            <span class="price">₹350</span>
+            <span class="category">Essentials</span>
+          </div>
+          <p class="description">Casio FX-991EX with original box and manual. Perfect condition.</p>
+          <div class="listing-stats">
+            <div class="stat">
+              <i class="fas fa-eye"></i> 124 views
+            </div>
+            <div class="stat">
+              <i class="fas fa-comment"></i> 5 messages
+            </div>
+          </div>
+          <div class="listing-actions">
+            <button class="btn-edit">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-promote">
+              <i class="fas fa-bolt"></i> Promote
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card">
+        <div class="listing-badge pending">Pending</div>
+        <div class="listing-image">
+          <img src="https://images.unsplash.com/photo-1592078615290-033ee584e267?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Textbook">
+          <div class="image-count"><i class="fas fa-camera"></i> 2</div>
+        </div>
+        <div class="listing-info">
+          <h3>Data Structures Textbook</h3>
+          <div class="listing-meta">
+            <span class="price">₹450</span>
+            <span class="category">Textbooks</span>
+          </div>
+          <p class="description">Like new condition with minimal highlighting. 3rd edition.</p>
+          <div class="listing-stats">
+            <div class="stat">
+              <i class="fas fa-eye"></i> 89 views
+            </div>
+            <div class="stat">
+              <i class="fas fa-comment"></i> 3 messages
+            </div>
+          </div>
+          <div class="listing-actions">
+            <button class="btn-edit">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-mark-sold">
+              <i class="fas fa-check"></i> Mark Sold
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card">
+        <div class="listing-badge sold">Sold</div>
+        <div class="listing-image">
+          <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Hostel Chair">
+          <div class="image-count"><i class="fas fa-camera"></i> 4</div>
+        </div>
+        <div class="listing-info">
+          <h3>Hostel Chair</h3>
+          <div class="listing-meta">
+            <span class="price">₹600</span>
+            <span class="category">Hostel</span>
+          </div>
+          <p class="description">Comfortable chair with back support. Good condition.</p>
+          <div class="listing-stats">
+            <div class="stat">
+              <i class="fas fa-eye"></i> 156 views
+            </div>
+            <div class="stat">
+              <i class="fas fa-comment"></i> 8 messages
+            </div>
+          </div>
+          <div class="listing-actions">
+            <button class="btn-relist">
+              <i class="fas fa-redo"></i> Relist
+            </button>
+            <button class="btn-delete">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="listing-card">
+        <div class="listing-badge available">Available</div>
+        <div class="listing-image">
+          <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Drafting Set">
+          <div class="image-count"><i class="fas fa-camera"></i> 3</div>
+        </div>
+        <div class="listing-info">
+          <h3>Engineering Drafting Set</h3>
+          <div class="listing-meta">
+            <span class="price">₹250</span>
+            <span class="category">Stationery</span>
+          </div>
+          <p class="description">Complete set with compass, protractor, and rulers.</p>
+          <div class="listing-stats">
+            <div class="stat">
+              <i class="fas fa-eye"></i> 67 views
+            </div>
+            <div class="stat">
+              <i class="fas fa-comment"></i> 2 messages
+            </div>
+          </div>
+          <div class="listing-actions">
+            <button class="btn-edit">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <button class="btn-promote">
+              <i class="fas fa-bolt"></i> Promote
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="listings-pagination">
+      <button class="page-btn disabled">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Status filter functionality
+    const statusFilter = document.querySelector('.status-filter');
+    const listingCards = document.querySelectorAll('.listing-card');
+    
+    statusFilter.addEventListener('change', function() {
+      const status = this.value;
+      
+      listingCards.forEach(card => {
+        if (status === 'all') {
+          card.style.display = 'flex';
+        } else {
+          const cardStatus = card.querySelector('.listing-badge').classList[1];
+          card.style.display = cardStatus === status ? 'flex' : 'none';
+        }
+      });
+    });
+
+    // Delete listing confirmation
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to delete this listing?')) {
+          this.closest('.listing-card').style.display = 'none';
+          // Here you would typically make an API call to delete the listing
+        }
+      });
+    });
+
+    // Mark as sold functionality
+    const markSoldButtons = document.querySelectorAll('.btn-mark-sold');
+    markSoldButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const card = this.closest('.listing-card');
+        const badge = card.querySelector('.listing-badge');
+        
+        badge.classList.remove('pending');
+        badge.classList.add('sold');
+        badge.textContent = 'Sold';
+        
+        // Change action buttons
+        const actions = card.querySelector('.listing-actions');
+        actions.innerHTML = `
+          <button class="btn-relist">
+            <i class="fas fa-redo"></i> Relist
+          </button>
+          <button class="btn-delete">
+            <i class="fas fa-trash"></i> Delete
+          </button>
+        `;
+        
+        // Here you would typically make an API call to update the listing status
+      });
+    });
+  </script>
+</body>
+</html>

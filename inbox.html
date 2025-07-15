@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inbox - Student Crew</title>
+  <link rel="stylesheet" href="inbox.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html" class="active"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="inbox-container">
+    <div class="inbox-sidebar">
+      <div class="sidebar-header">
+        <h2>Messages</h2>
+        <button class="new-chat">
+          <i class="fas fa-plus"></i> New Chat
+        </button>
+      </div>
+      
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search messages...">
+      </div>
+      
+      <div class="chat-list">
+        <div class="chat-item active">
+          <div class="chat-avatar">
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+            <span class="online"></span>
+          </div>
+          <div class="chat-info">
+            <div class="chat-header">
+              <h4>Ananya Rao</h4>
+              <span class="time">10:30 AM</span>
+            </div>
+            <p class="last-message">Hey, is the calculator still available?</p>
+            <span class="unread-count">2</span>
+          </div>
+        </div>
+        
+        <div class="chat-item">
+          <div class="chat-avatar">
+            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
+          </div>
+          <div class="chat-info">
+            <div class="chat-header">
+              <h4>Rahul Kumar</h4>
+              <span class="time">Yesterday</span>
+            </div>
+            <p class="last-message">Thanks for the textbook!</p>
+          </div>
+        </div>
+        
+        <div class="chat-item">
+          <div class="chat-avatar">
+            <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="User">
+            <span class="online"></span>
+          </div>
+          <div class="chat-info">
+            <div class="chat-header">
+              <h4>Priya Sharma</h4>
+              <span class="time">2 days ago</span>
+            </div>
+            <p class="last-message">Can we meet tomorrow at 3 PM?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="chat-window">
+      <div class="chat-header">
+        <div class="chat-user">
+          <div class="chat-avatar">
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+            <span class="online"></span>
+          </div>
+          <div class="user-info">
+            <h3>Ananya Rao</h3>
+            <p class="status">Online</p>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <button><i class="fas fa-phone"></i></button>
+          <button><i class="fas fa-video"></i></button>
+          <button><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+      </div>
+      
+      <div class="chat-messages">
+        <div class="message-day">
+          <span>Today</span>
+        </div>
+        
+        <div class="message received">
+          <div class="message-content">
+            <p>Hey, is the calculator still available?</p>
+            <span class="message-time">10:30 AM</span>
+          </div>
+        </div>
+        
+        <div class="message sent">
+          <div class="message-content">
+            <p>Yes, it's still available. Are you interested?</p>
+            <span class="message-time">10:32 AM</span>
+          </div>
+        </div>
+        
+        <div class="message received">
+          <div class="message-content">
+            <p>Yes! Can we meet today evening?</p>
+            <span class="message-time">10:33 AM</span>
+          </div>
+        </div>
+        
+        <div class="message sent">
+          <div class="message-content">
+            <p>Sure, how about 6 PM at the college canteen?</p>
+            <span class="message-time">10:34 AM</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="message-input">
+        <button class="emoji-btn">
+          <i class="far fa-smile"></i>
+        </button>
+        <input type="text" placeholder="Type your message...">
+        <button class="send-btn">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Chat item click handler
+    const chatItems = document.querySelectorAll('.chat-item');
+    chatItems.forEach(item => {
+      item.addEventListener('click', function() {
+        chatItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        // Here you would typically load the chat messages for this conversation
+      });
+    });
+
+    // Send message handler
+    const messageInput = document.querySelector('.message-input input');
+    const sendBtn = document.querySelector('.send-btn');
+    
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message) {
+        // Here you would typically send the message to the server
+        const messagesContainer = document.querySelector('.chat-messages');
+        const newMessage = document.createElement('div');
+        newMessage.className = 'message sent';
+        newMessage.innerHTML = `
+          <div class="message-content">
+            <p>${message}</p>
+            <span class="message-time">Just now</span>
+          </div>
+        `;
+        messagesContainer.appendChild(newMessage);
+        messageInput.value = '';
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }
+    
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>

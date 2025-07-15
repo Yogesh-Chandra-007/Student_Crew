@@ -1,0 +1,83 @@
+<!-- Student Crew - FAQ Page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQs - Student Crew</title>
+  <link rel="stylesheet" href="faq.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <!-- Profile Icon -->
+  <div class="profile-icon" onclick="toggleProfileMenu()"></div>
+  <div class="profile-menu" id="profileMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="settings.html">Settings</a>
+    <a href="friends.html">Friends</a>
+    <a href="coins.html">Coins</a>
+    <a href="login.html">Logout</a>
+  </div>
+
+  <div class="faq-container">
+    <h1>❓ Frequently Asked Questions</h1>
+
+    <div class="faq-item">
+      <h3>How do I list a product?</h3>
+      <p>You can list a product by clicking on 'Sell Now' from the dashboard and filling out the form.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>What are Coins used for?</h3>
+      <p>Coins help unlock special features, promotions, or highlights on your listings.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Is it safe to meet buyers/sellers on campus?</h3>
+      <p>We recommend meeting in public spots on campus and informing a friend before you meet.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How do I report inappropriate content?</h3>
+      <p>Use the 'Report Issue' option under your profile menu to flag any listings or users.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>How can I reset my password?</h3>
+      <p>Visit the login page and click 'Forgot Password' to receive reset instructions.</p>
+    </div>
+
+    <button class="back-btn" onclick="goBack()">← Back </button>
+  </div>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    window.onclick = function (e) {
+      const menu = document.getElementById("profileMenu");
+      const icon = document.querySelector(".profile-icon");
+      if (!menu.contains(e.target) && !icon.contains(e.target)) {
+        menu.style.display = "none";
+      }
+    };
+
+    // FAQ toggling
+    document.querySelectorAll('.faq-item h3').forEach(q => {
+      q.addEventListener('click', () => {
+        const p = q.nextElementSibling;
+        p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+
+    function goBack() {
+      window.history.back(); // Go back to the previous page
+    }
+  </script>
+</body>
+</html>
