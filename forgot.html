@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Crew - Forgot Password</title>
+  <link rel="stylesheet" href="forgot.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <i class="fas fa-users"></i>
+          <span>Student Crew</span>
+        </div>
+        <h1>Forgot Password?</h1>
+        <p>Enter your email and we'll send reset instructions</p>
+      </div>
+      
+      <form class="auth-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Enter your email" required>
+          </div>
+        </div>
+        
+        <button type="submit" class="auth-btn">Send Reset Link</button>
+        
+        <div class="auth-footer">
+          Remember your password? <a href="login.html">Log in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Form submission
+    const forgotForm = document.querySelector('.auth-form');
+    forgotForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Add your forgot password logic here
+      alert('Password reset link has been sent to your email');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

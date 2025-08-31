@@ -1,0 +1,134 @@
+/* General Page Setup */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e);
+  color: white;
+}
+
+/* Glowing Background Animation */
+.glow-bg {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  top: 50%;
+  left: 50%;
+  background: rgba(0, 255, 255, 0.1);
+  border-radius: 50%;
+  filter: blur(150px);
+  transform: translate(-50%, -50%);
+  animation: pulse 6s infinite ease-in-out;
+  z-index: -1;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 1; }
+  50% { transform: scale(1.2) translate(-50%, -50%); opacity: 0.6; }
+}
+
+/* Container */
+.faq-container {
+  max-width: 800px;
+  margin: 100px auto;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.2);
+}
+
+/* Header */
+.faq-container h1 {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 30px;
+  color: cyan;
+}
+
+/* FAQ Item */
+.faq-item {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+.faq-item h3 {
+  margin: 0;
+  font-size: 1.2em;
+  color: #00e6e6;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.faq-item h3:hover {
+  color: #00ffff;
+}
+.faq-item p {
+  display: none;
+  margin-top: 10px;
+  font-size: 0.95em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Back Button */
+.back-btn {
+  margin-top: 30px;
+  padding: 10px 25px;
+  border-radius: 25px;
+  background: rgba(0, 255, 255, 0.1);
+  border: none;
+  color: cyan;
+  font-size: 1em;
+  cursor: pointer;
+  transition: 0.3s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.back-btn:hover {
+  background: rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
+}
+
+/* Profile Floating Menu */
+.profile-icon {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-image: url('https://www.w3schools.com/howto/img_avatar.png');
+  background-size: cover;
+  background-position: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  cursor: pointer;
+  z-index: 10;
+}
+.profile-menu {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  padding: 10px;
+  display: none;
+  z-index: 10;
+}
+.profile-menu a {
+  display: block;
+  padding: 10px;
+  color: white;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.profile-menu a:hover {
+  color: #00c6ff;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .faq-container {
+    padding: 20px;
+    margin: 50px 15px;
+  }
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - Student Crew</title>
+  <link rel="stylesheet" href="pd.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="product-container">
+    <div class="product-gallery">
+      <div class="main-image">
+        <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Scientific Calculator">
+      </div>
+      <div class="thumbnail-grid">
+        <div class="thumbnail active">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Thumbnail 1">
+        </div>
+        <div class="thumbnail">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Thumbnail 2">
+        </div>
+        <div class="thumbnail">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Thumbnail 3">
+        </div>
+        <div class="thumbnail">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Thumbnail 4">
+        </div>
+      </div>
+    </div>
+
+    <div class="product-details">
+      <div class="product-header">
+        <h1>Scientific Calculator</h1>
+        <div class="product-meta">
+          <span class="category">Essentials</span>
+          <span class="date">Listed 3 days ago</span>
+        </div>
+        <div class="price">₹350</div>
+      </div>
+
+      <div class="product-description">
+        <h3>Description</h3>
+        <p>A perfect calculator for engineering students. This Casio FX-991EX scientific calculator is fully functional, lightly used, and approved for all university exams. Comes with original box and manual.</p>
+        <ul class="features">
+          <li><i class="fas fa-check-circle"></i> 552 scientific functions</li>
+          <li><i class="fas fa-check-circle"></i> Natural textbook display</li>
+          <li><i class="fas fa-check-circle"></i> Solar powered with battery backup</li>
+          <li><i class="fas fa-check-circle"></i> QR code generation</li>
+        </ul>
+      </div>
+
+      <div class="seller-info">
+        <h3>Seller Information</h3>
+        <div class="seller-card">
+          <div class="seller-avatar">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Seller">
+          </div>
+          <div class="seller-details">
+            <h4>John Doe</h4>
+            <p class="college">VVIT College, Guntur</p>
+            <div class="seller-meta">
+              <span class="rating"><i class="fas fa-star"></i> 4.8 (24 reviews)</span>
+              <span class="joined">Member since 2024</span>
+            </div>
+          </div>
+        </div>
+        <div class="seller-contact">
+          <p><i class="fas fa-map-marker-alt"></i> C-Block, Room 204</p>
+          <p><i class="fas fa-envelope"></i> johndoe@example.com</p>
+          <p><i class="fas fa-phone"></i> +91 9876543210</p>
+        </div>
+      </div>
+
+      <div class="product-actions">
+        <button class="btn-primary">
+          <i class="fas fa-comment-dots"></i> Chat with Seller
+        </button>
+        <button class="btn-secondary" onclick="window.history.back()">
+          <i class="fas fa-arrow-left"></i> Back to Listings
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Thumbnail click handler
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const mainImage = document.querySelector('.main-image img');
+    
+    thumbnails.forEach(thumb => {
+      thumb.addEventListener('click', function() {
+        // Remove active class from all thumbnails
+        thumbnails.forEach(t => t.classList.remove('active'));
+        // Add active class to clicked thumbnail
+        this.classList.add('active');
+        // Update main image
+        const thumbImg = this.querySelector('img');
+        mainImage.src = thumbImg.src.replace('200', '800');
+      });
+    });
+  </script>
+</body>
+</html>

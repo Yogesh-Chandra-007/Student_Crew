@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History - Student Crew</title>
+  <link rel="stylesheet" href="history.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
+      <a href="history.html" class="active"><i class="fas fa-history"></i> History</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="history-container">
+    <div class="history-header">
+      <h1>Transaction History</h1>
+      <p>Review your past purchases and sales</p>
+    </div>
+
+    <div class="history-controls">
+      <div class="time-filter">
+        <button class="time-btn active">All</button>
+        <button class="time-btn">This Month</button>
+        <button class="time-btn">Last 3 Months</button>
+        <button class="time-btn">This Year</button>
+      </div>
+      <div class="type-filter">
+        <select id="transaction-type">
+          <option value="all">All Transactions</option>
+          <option value="sold">Items Sold</option>
+          <option value="bought">Items Bought</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="history-summary">
+      <div class="summary-card">
+        <div class="summary-icon sold">
+          <i class="fas fa-rupee-sign"></i>
+        </div>
+        <div class="summary-info">
+          <h3>₹3,450</h3>
+          <p>Total Earned</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon bought">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="summary-info">
+          <h3>₹1,850</h3>
+          <p>Total Spent</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon transactions">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="summary-info">
+          <h3>12</h3>
+          <p>Total Transactions</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="history-list">
+      <div class="history-item sold">
+        <div class="item-image">
+          <img src="https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Scientific Calculator">
+        </div>
+        <div class="item-info">
+          <h3>Scientific Calculator</h3>
+          <div class="item-meta">
+            <span class="price">₹350</span>
+            <span class="date">Jun 15, 2025</span>
+          </div>
+          <p class="buyer">Sold to <strong>Ananya Rao</strong></p>
+          <div class="item-rating">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+              <span>4.5</span>
+            </div>
+            <button class="btn-view-details" onclick="window.location.href='pd.html'">
+              View Details
+            </button>
+          </div>
+        </div>
+        <div class="item-status completed">
+          <i class="fas fa-check-circle"></i> Completed
+        </div>
+      </div>
+
+      <div class="history-item bought">
+        <div class="item-image">
+          <img src="https://images.unsplash.com/photo-1592078615290-033ee584e267?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Textbook">
+        </div>
+        <div class="item-info">
+          <h3>Data Structures Textbook</h3>
+          <div class="item-meta">
+            <span class="price">₹450</span>
+            <span class="date">May 28, 2025</span>
+          </div>
+          <p class="seller">Bought from <strong>Rahul Kumar</strong></p>
+          <div class="item-rating">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="far fa-star"></i>
+              <span>4.0</span>
+            </div>
+            <button class="btn-view-details" onclick="window.location.href='pd.html'">
+              View Details
+            </button>
+          </div>
+        </div>
+        <div class="item-status completed">
+          <i class="fas fa-check-circle"></i> Completed
+        </div>
+      </div>
+
+      <div class="history-item sold">
+        <div class="item-image">
+          <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Hostel Chair">
+        </div>
+        <div class="item-info">
+          <h3>Hostel Chair</h3>
+          <div class="item-meta">
+            <span class="price">₹600</span>
+            <span class="date">Apr 10, 2025</span>
+          </div>
+          <p class="buyer">Sold to <strong>Priya Sharma</strong></p>
+          <div class="item-rating">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <span>5.0</span>
+            </div>
+            <button class="btn-view-details" onclick="window.location.href='pd.html'">
+              View Details
+            </button>
+          </div>
+        </div>
+        <div class="item-status completed">
+          <i class="fas fa-check-circle"></i> Completed
+        </div>
+      </div>
+
+      <div class="history-item bought">
+        <div class="item-image">
+          <img src="https://images.unsplash.com/photo-1581093450021-4a7360e9a6a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Drafting Set">
+        </div>
+        <div class="item-info">
+          <h3>Engineering Drafting Set</h3>
+          <div class="item-meta">
+            <span class="price">₹250</span>
+            <span class="date">Mar 22, 2025</span>
+          </div>
+          <p class="seller">Bought from <strong>Deepak Singh</strong></p>
+          <div class="item-rating">
+            <div class="stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <span>5.0</span>
+            </div>
+            <button class="btn-view-details" onclick="window.location.href='pd.html'">
+              View Details
+            </button>
+          </div>
+        </div>
+        <div class="item-status completed">
+          <i class="fas fa-check-circle"></i> Completed
+        </div>
+      </div>
+    </div>
+
+    <div class="history-pagination">
+      <button class="page-btn disabled">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Time filter functionality
+    const timeBtns = document.querySelectorAll('.time-btn');
+    timeBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        timeBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // Here you would typically filter transactions by time period
+      });
+    });
+
+    // Type filter functionality
+    const typeFilter = document.getElementById('transaction-type');
+    const historyItems = document.querySelectorAll('.history-item');
+    
+    typeFilter.addEventListener('change', function() {
+      const type = this.value;
+      
+      historyItems.forEach(item => {
+        if (type === 'all') {
+          item.style.display = 'flex';
+        } else {
+          const itemType = item.classList[1];
+          item.style.display = itemType === type ? 'flex' : 'none';
+        }
+      });
+    });
+
+    // Rating stars hover effect
+    const starsContainers = document.querySelectorAll('.stars');
+    starsContainers.forEach(container => {
+      const stars = container.querySelectorAll('.fa-star, .fa-star-half-alt');
+      const rating = parseFloat(container.querySelector('span').textContent);
+      
+      stars.forEach((star, index) => {
+        // Set initial rating
+        if (index < Math.floor(rating)) {
+          star.classList.add('fas');
+          star.classList.remove('far');
+        } else if (index === Math.floor(rating) && rating % 1 >= 0.5) {
+          star.classList.add('fas', 'fa-star-half-alt');
+          star.classList.remove('far', 'fa-star');
+        } else {
+          star.classList.add('far');
+          star.classList.remove('fas');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

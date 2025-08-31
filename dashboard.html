@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Crew - Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-brand">
+      <i class="fas fa-users"></i>
+      <span>Student Crew</span>
+    </div>
+    <div class="nav-links">
+      <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Home</a>
+      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
+      <a href="listings.html"><i class="fas fa-list"></i> Listings</a>
+      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
+    </div>
+    <div class="nav-profile" onclick="toggleProfileMenu()">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <!-- Update this in all HTML files (dashboard.html, terms.html, report.html) -->
+<div class="profile-menu" id="profileMenu">
+  <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+  <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+  <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+  <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+  <div class="divider"></div>
+  <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+  <a href="report.html"><i class="fas fa-bug"></i> Report Issue</a>
+  <div class="divider"></div>
+  <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+    </div>
+  </nav>
+
+  <main class="dashboard-container">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+      <div class="welcome-content">
+        <h1>Welcome back, <span>John</span>!</h1>
+        <p>What would you like to do today?</p>
+      </div>
+      <div class="stats-card">
+        <div class="stat-item">
+          <div class="stat-icon coin">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="stat-info">
+            <h3>120</h3>
+            <p>Coins</p>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon listing">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <div class="stat-info">
+            <h3>8</h3>
+            <p>Listings</p>
+          </div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon friend">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <div class="stat-info">
+            <h3>15</h3>
+            <p>Friends</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="action-grid">
+        <a href="sell.html" class="action-card sell">
+          <i class="fas fa-plus-circle"></i>
+          <h3>Sell Item</h3>
+          <p>List a new product for sale</p>
+        </a>
+        <a href="listings.html" class="action-card listings">
+          <i class="fas fa-list"></i>
+          <h3>My Listings</h3>
+          <p>Manage your products</p>
+        </a>
+        <a href="history.html" class="action-card history">
+          <i class="fas fa-history"></i>
+          <h3>History</h3>
+          <p>View past transactions</p>
+        </a>
+        <a href="invite.html" class="action-card invite">
+          <i class="fas fa-user-plus"></i>
+          <h3>Invite Friends</h3>
+          <p>Earn bonus coins</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <h2 class="section-title">Find Products</h2>
+      <div class="search-container">
+        <div class="search-bar">
+          <input type="text" placeholder="Search for textbooks, gadgets, hostel items...">
+          <button><i class="fas fa-search"></i></button>
+        </div>
+        <div class="search-tags">
+          <span class="tag">#Textbooks</span>
+          <span class="tag">#Stationery</span>
+          <span class="tag">#Gadgets</span>
+          <span class="tag">#Hostel</span>
+          <span class="tag">#Essentials</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="activity-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <a href="notifications.html" class="view-all">View All</a>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-comment-dots"></i>
+          </div>
+          <div class="activity-content">
+            <p><strong>New message</strong> from Rahul about your calculator</p>
+            <span class="activity-time">2 minutes ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="activity-content">
+            <p>Your <strong>drafting set</strong> was sold for ₹500</p>
+            <span class="activity-time">1 hour ago</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const profileMenu = document.getElementById('profileMenu');
+      const profileBtn = document.querySelector('.nav-profile');
+      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
+        profileMenu.classList.remove('active');
+      }
+    });
+
+    // Animated placeholder for search
+    const searchInput = document.querySelector('.search-bar input');
+    const phrases = [
+      "Search for textbooks...", 
+      "Looking for stationery?",
+      "Find hostel essentials...",
+      "Search by product name..."
+    ];
+    let currentPhrase = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+
+    function typePlaceholder() {
+      const fullPhrase = phrases[currentPhrase];
+      
+      if (isDeleting) {
+        searchInput.placeholder = fullPhrase.substring(0, charIndex - 1);
+        charIndex--;
+      } else {
+        searchInput.placeholder = fullPhrase.substring(0, charIndex + 1);
+        charIndex++;
+      }
+
+      if (!isDeleting && charIndex === fullPhrase.length) {
+        isDeleting = true;
+        typingSpeed = 50;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        currentPhrase = (currentPhrase + 1) % phrases.length;
+        typingSpeed = 100;
+      }
+
+      setTimeout(typePlaceholder, typingSpeed);
+    }
+
+    // Start the animation
+    setTimeout(typePlaceholder, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Invite Friends - Student Crew</title>
+  <link rel="stylesheet" href="invite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <!-- Profile Icon -->
+  <div class="profile-icon" onclick="toggleProfileMenu()"></div>
+  <div class="profile-menu" id="profileMenu">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="profile.html">Profile</a>
+    <a href="settings.html">Settings</a>
+    <a href="friends.html">Friends</a>
+    <a href="coins.html">Coins</a>
+    <a href="login.html">Logout</a>
+  </div>
+
+  <div class="invite-container">
+    <h1>🎉 Invite Your Friends</h1>
+    <p>Share Student Crew with your friends and earn <strong>💰 10 Coins</strong> for every signup using your referral link!</p>
+
+    <label for="referral">Your Referral Link:</label>
+    <div class="referral-box">
+      <input type="text" id="referral" value="https://studentcrew.app/signup?ref=yourusername" readonly />
+      <button onclick="copyReferral()">Copy</button>
+    </div>
+
+    <div class="share-buttons">
+      <button onclick="shareTo('whatsapp')">WhatsApp</button>
+      <button onclick="shareTo('telegram')">Telegram</button>
+      <button onclick="shareTo('email')">Gmail</button>
+    </div>
+
+    <p class="note">Coins will be credited once your friend signs up and verifies their account.</p>
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+  </div>
+
+  <script>
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    window.onclick = function (e) {
+      const menu = document.getElementById("profileMenu");
+      const icon = document.querySelector(".profile-icon");
+      if (!menu.contains(e.target) && !icon.contains(e.target)) {
+        menu.style.display = "none";
+      }
+    };
+
+    function copyReferral() {
+      const input = document.getElementById("referral");
+      input.select();
+      input.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(input.value);
+      alert("Referral link copied!");
+    }
+
+    function shareTo(platform) {
+      const url = document.getElementById("referral").value;
+      let link = "";
+      if (platform === "whatsapp") {
+        link = `https://wa.me/?text=Join%20Student%20Crew%20and%20earn%20cool%20rewards!%20${encodeURIComponent(url)}`;
+      } else if (platform === "telegram") {
+        link = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Join Student Crew and earn rewards!`;
+      } else if (platform === "email") {
+        link = `mailto:?subject=Join Student Crew!&body=Check this out: ${encodeURIComponent(url)}`;
+      }
+      window.open(link, "_blank");
+    }
+  </script>
+</body>
+</html>

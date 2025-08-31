@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Crew - Select College</title>
+  <link rel="stylesheet" href="college.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  
+  <div class="college-container">
+    <div class="college-card">
+      <div class="college-header">
+        <div class="logo">
+          <i class="fas fa-users"></i>
+          <span>Student Crew</span>
+        </div>
+        <h1>Select Your College</h1>
+        <p>Choose your college to continue</p>
+      </div>
+      
+      <form class="college-form">
+        <div class="form-group">
+          <label for="college-select">College</label>
+          <div class="select-wrapper">
+            <i class="fas fa-university"></i>
+            <select id="college-select" required>
+              <option value="">Select your college</option>
+              <option value="VVIT">VVIT, Guntur</option>
+              <option value="JNTU-K">JNTU, Kakinada</option>
+              <option value="AUCE">AUCE, Visakhapatnam</option>
+              <option value="NIT-T">NIT, Tadepalligudem</option>
+              <option value="SVUCE">SVU, Tirupati</option>
+              <option value="VRSEC">VRSEC, Vijayawada</option>
+              <option value="GVPCE">GVPCE, Vizag</option>
+              <option value="Vignan">Vignan, Guntur</option>
+              <option value="GITAM">GITAM, Visakhapatnam</option>
+              <option value="RVRJC">RVR & JC, Guntur</option>
+              <option value="ANITS">ANITS, Visakhapatnam</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit" class="college-btn">Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('.college-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const college = document.getElementById("college-select").value;
+      if (college) {
+        window.location.href = "dashboard.html";
+      } else {
+        alert("Please select a college first!");
+      }
+    });
+  </script>
+</body>
+</html>
