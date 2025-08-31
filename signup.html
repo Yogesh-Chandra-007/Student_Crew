@@ -7,7 +7,43 @@
   <link rel="stylesheet" href="signup.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script type="module" src="signup.js" defer></script>
+  <style>
+    .error-message {
+      color: #ff3860;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    .loading::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -12px 0 0 -12px;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .password-hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <div class="gradient-bg"></div>
@@ -23,13 +59,14 @@
         <p>Join the Student Crew and start connecting!</p>
       </div>
       
-      <form class="auth-form">
+      <form class="auth-form" id="signupForm">
         <div class="form-group">
           <label for="fullname">Full Name</label>
           <div class="input-with-icon">
             <i class="fas fa-user"></i>
             <input type="text" id="fullname" placeholder="Enter your full name" required>
           </div>
+          <div class="error-message" id="fullnameError"></div>
         </div>
         
         <div class="form-group">
@@ -38,6 +75,7 @@
             <i class="fas fa-envelope"></i>
             <input type="email" id="email" placeholder="Enter your email" required>
           </div>
+          <div class="error-message" id="emailError"></div>
         </div>
         
         <div class="form-group">
@@ -47,6 +85,8 @@
             <input type="password" id="password" placeholder="Create a password" required>
             <i class="fas fa-eye toggle-password"></i>
           </div>
+          <div class="error-message" id="passwordError"></div>
+          <small class="password-hint">Password must be at least 6 characters long</small>
         </div>
         
         <div class="form-group">
@@ -55,16 +95,18 @@
             <i class="fas fa-lock"></i>
             <input type="password" id="confirm-password" placeholder="Confirm your password" required>
           </div>
+          <div class="error-message" id="confirmPasswordError"></div>
         </div>
         
         <div class="form-options">
           <div class="terms-agreement">
-            <input type="checkbox" id="terms">
+            <input type="checkbox" id="terms" required>
             <label for="terms">I agree to the <a href="terms.html">Terms & Conditions</a></label>
           </div>
+          <div class="error-message" id="termsError"></div>
         </div>
         
-        <button type="submit" class="auth-btn">Sign Up</button>
+        <button type="submit" class="auth-btn" id="signupBtn">Sign Up</button>
         
         <div class="auth-divider">
           <span>or sign up with</span>
@@ -86,24 +128,150 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    // Firebase imports
+    import { auth, db } from "./firebase-config.js";
+    import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // DOM elements
+    const signupForm = document.getElementById('signupForm');
+    const fullnameInput = document.getElementById('fullname');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const termsCheckbox = document.getElementById('terms');
+    const signupBtn = document.getElementById('signupBtn');
+    const fullnameError = document.getElementById('fullnameError');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+    const termsError = document.getElementById('termsError');
+
     // Toggle password visibility
     const togglePassword = document.querySelector('.toggle-password');
-    const passwordInput = document.getElementById('password');
-    
     togglePassword.addEventListener('click', function() {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
       this.classList.toggle('fa-eye-slash');
     });
-    
+
     // Form submission
-    const signupForm = document.querySelector('.auth-form');
-    signupForm.addEventListener('submit', function(e) {
+    signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      // Add your signup logic here
-      window.location.href = 'college.html';
+      
+      // Reset error messages
+      fullnameError.style.display = 'none';
+      emailError.style.display = 'none';
+      passwordError.style.display = 'none';
+      confirmPasswordError.style.display = 'none';
+      termsError.style.display = 'none';
+      
+      const fullname = fullnameInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      const termsAgreed = termsCheckbox.checked;
+      
+      // Validation
+      let isValid = true;
+      
+      if (!fullname) {
+        fullnameError.textContent = 'Full name is required';
+        fullnameError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!email) {
+        emailError.textContent = 'Email is required';
+        emailError.style.display = 'block';
+        isValid = false;
+      } else if (!isValidEmail(email)) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!password) {
+        passwordError.textContent = 'Password is required';
+        passwordError.style.display = 'block';
+        isValid = false;
+      } else if (password.length < 6) {
+        passwordError.textContent = 'Password must be at least 6 characters';
+        passwordError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!confirmPassword) {
+        confirmPasswordError.textContent = 'Please confirm your password';
+        confirmPasswordError.style.display = 'block';
+        isValid = false;
+      } else if (password !== confirmPassword) {
+        confirmPasswordError.textContent = 'Passwords do not match';
+        confirmPasswordError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!termsAgreed) {
+        termsError.textContent = 'You must agree to the terms and conditions';
+        termsError.style.display = 'block';
+        isValid = false;
+      }
+      
+      if (!isValid) return;
+      
+      // Set loading state
+      signupBtn.classList.add('loading');
+      signupBtn.disabled = true;
+      
+      try {
+        // Create user with email and password
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        
+        // Update user profile with full name
+        await updateProfile(user, { displayName: fullname });
+        
+        // Save user data to Realtime Database
+        await set(ref(db, "users/" + user.uid), {
+          fullname: fullname,
+          email: email,
+          createdAt: new Date().toISOString()
+        });
+        
+        // Success - redirect to college page
+        window.location.href = 'college.html';
+      } catch (error) {
+        // Handle errors
+        signupBtn.classList.remove('loading');
+        signupBtn.disabled = false;
+        
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            emailError.textContent = 'This email is already registered';
+            emailError.style.display = 'block';
+            break;
+          case 'auth/invalid-email':
+            emailError.textContent = 'Invalid email address';
+            emailError.style.display = 'block';
+            break;
+          case 'auth/operation-not-allowed':
+            alert('Email/password accounts are not enabled. Please contact support.');
+            break;
+          case 'auth/weak-password':
+            passwordError.textContent = 'Password is too weak';
+            passwordError.style.display = 'block';
+            break;
+          default:
+            alert('Signup error: ' + error.message);
+        }
+      }
     });
+
+    function isValidEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
   </script>
 </body>
 </html>
