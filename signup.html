@@ -17,6 +17,7 @@
     .loading {
       opacity: 0.7;
       pointer-events: none;
+      position: relative;
     }
     .loading::after {
       content: "";
@@ -38,6 +39,35 @@
       font-size: 12px;
       color: #666;
       margin-top: 5px;
+    }
+
+    /* ✅ Toast styles (same as login) */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      min-width: 250px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #ff3860; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
     }
   </style>
 </head>
@@ -111,9 +141,6 @@
           <button type="button" class="social-btn google">
             <i class="fab fa-google"></i> Google
           </button>
-          <button type="button" class="social-btn facebook">
-            <i class="fab fa-facebook-f"></i> Facebook
-          </button>
         </div>
 
         <div class="auth-footer">
@@ -123,7 +150,110 @@
     </div>
   </div>
 
-  <!-- ✅ Import external JS instead of inline -->
-  <script type="module" src="./signup.js"></script>
+  <!-- ✅ Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { 
+      createUserWithEmailAndPassword, 
+      updateProfile, 
+      GoogleAuthProvider, 
+      signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const signupForm = document.getElementById('signupForm');
+    const fullnameInput = document.getElementById('fullname');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const termsCheckbox = document.getElementById('terms');
+    const signupBtn = document.getElementById('signupBtn');
+    const togglePassword = document.querySelector('.toggle-password');
+    const googleBtn = document.querySelector(".social-btn.google");
+
+    // ✅ Toast function
+    const toastContainer = document.getElementById("toastContainer");
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = "toast " + type;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    // Toggle password visibility
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    // ✅ Signup handler
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!termsCheckbox.checked) {
+        showToast("Please agree to the Terms & Conditions.", "error");
+        return;
+      }
+      if (passwordInput.value !== confirmPasswordInput.value) {
+        showToast("Passwords do not match!", "error");
+        return;
+      }
+
+      signupBtn.classList.add("loading");
+      signupBtn.disabled = true;
+
+      try {
+        const cred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+        await updateProfile(cred.user, { displayName: fullnameInput.value });
+
+        await set(ref(db, "users/" + cred.user.uid), {
+          uid: cred.user.uid,
+          name: fullnameInput.value,
+          email: emailInput.value,
+          createdAt: serverTimestamp()
+        });
+
+        showToast("Account created successfully! Redirecting...", "success");
+        setTimeout(() => {
+          window.location.href = "college.html";
+        }, 2000);
+      } catch (error) {
+        showToast("Signup failed: " + error.message, "error");
+        signupBtn.classList.remove("loading");
+        signupBtn.disabled = false;
+      }
+    });
+
+    // ✅ Google signup/login
+    googleBtn.addEventListener("click", async () => {
+      signupBtn.classList.add("loading");
+      signupBtn.disabled = true;
+      try {
+        const provider = new GoogleAuthProvider();
+        const cred = await signInWithPopup(auth, provider);
+
+        await set(ref(db, "users/" + cred.user.uid), {
+          uid: cred.user.uid,
+          name: cred.user.displayName,
+          email: cred.user.email,
+          photoURL: cred.user.photoURL,
+          createdAt: serverTimestamp()
+        });
+
+        showToast("Google signup successful! Redirecting...", "success");
+        setTimeout(() => {
+          window.location.href = "college.html";
+        }, 2000);
+      } catch (err) {
+        showToast("Google signup failed: " + err.message, "error");
+        signupBtn.classList.remove("loading");
+        signupBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
