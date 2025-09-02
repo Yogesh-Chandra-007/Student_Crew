@@ -49,16 +49,44 @@
     </div>
   </div>
 
-  <script>
-    document.querySelector('.college-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const college = document.getElementById("college-select").value;
-      if (college) {
-        window.location.href = "dashboard.html";
-      } else {
-        alert("Please select a college first!");
-      }
-    });
-  </script>
+ <script type="module">
+  import { auth } from "./firebase-config.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // check authentication state
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // not logged in → redirect
+      window.location.href = "login.html";
+    } else {
+      console.log("User  is logged in:", user.email);
+      // you can also display user's name/email here
+    }
+  });
+
+  // optional: logout button logic
+  document.addEventListener("DOMContentLoaded", () => {
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
+    }
+  });
+
+  // existing form submission logic
+  document.querySelector('.college-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const college = document.getElementById("college-select").value;
+    if (college) {
+      window.location.href = "dashboard.html";
+    } else {
+      alert("Please select a college first!");
+    }
+  });
+</script>
+
 </body>
+
 </html>
