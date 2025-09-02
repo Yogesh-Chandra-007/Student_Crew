@@ -17,6 +17,7 @@
     .loading {
       opacity: 0.7;
       pointer-events: none;
+      position: relative;
     }
     .loading::after {
       content: "";
@@ -33,6 +34,35 @@
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    /* ✅ Toast styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      min-width: 250px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #ff3860; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
     }
   </style>
 </head>
@@ -87,9 +117,6 @@
           <button type="button" class="social-btn google">
             <i class="fab fa-google"></i> Google
           </button>
-          <button type="button" class="social-btn facebook">
-            <i class="fab fa-facebook-f"></i> Facebook
-          </button>
         </div>
 
         <div class="auth-footer">
@@ -99,6 +126,9 @@
     </div>
   </div>
 
+  <!-- ✅ Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { 
@@ -107,7 +137,8 @@
       browserSessionPersistence, 
       browserLocalPersistence,
       GoogleAuthProvider,
-      signInWithPopup 
+      signInWithPopup,
+      fetchSignInMethodsForEmail
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -116,73 +147,81 @@
     const passwordInput = document.getElementById('password');
     const rememberCheckbox = document.getElementById('remember');
     const loginBtn = document.getElementById('loginBtn');
-    const emailError = document.getElementById('emailError');
-    const passwordError = document.getElementById('passwordError');
-
     const togglePassword = document.querySelector('.toggle-password');
+    const googleBtn = document.querySelector(".social-btn.google");
+
+    // ✅ Toast function
+    const toastContainer = document.getElementById("toastContainer");
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = "toast " + type;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    // Toggle password visibility
     togglePassword.addEventListener('click', function() {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
       this.classList.toggle('fa-eye-slash');
     });
 
-    // Email/Password login
+    // Email/Password login with provider check
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      emailError.style.display = 'none';
-      passwordError.style.display = 'none';
 
       const email = emailInput.value.trim();
       const password = passwordInput.value;
       const rememberMe = rememberCheckbox.checked;
-      let isValid = true;
 
-      if (!email) {
-        emailError.textContent = 'Email is required';
-        emailError.style.display = 'block';
-        isValid = false;
+      if (!email || !password) {
+        showToast("Please enter both email and password.", "error");
+        return;
       }
-      if (!password) {
-        passwordError.textContent = 'Password is required';
-        passwordError.style.display = 'block';
-        isValid = false;
-      }
-      if (!isValid) return;
 
       loginBtn.classList.add('loading');
       loginBtn.disabled = true;
 
       try {
+        // 🔎 Check providers first
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+        console.log("Providers for this email:", methods);
+
+        if (methods.length === 0) {
+          showToast("No account found with this email.", "error");
+          loginBtn.classList.remove('loading');
+          loginBtn.disabled = false;
+          return;
+        }
+
+        if (methods.includes("google.com") && !methods.includes("password")) {
+          showToast("This account uses Google Sign-In. Please log in with Google.", "error");
+          loginBtn.classList.remove('loading');
+          loginBtn.disabled = false;
+          return;
+        }
+
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
         await setPersistence(auth, persistence);
 
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = 'college.html';
+        showToast("Login successful! Redirecting...", "success");
+
+        setTimeout(() => {
+          window.location.href = 'college.html';
+        }, 2000);
       } catch (error) {
+        showToast("Login failed: " + error.message, "error");
         loginBtn.classList.remove('loading');
         loginBtn.disabled = false;
-        switch (error.code) {
-          case 'auth/invalid-email':
-            emailError.textContent = 'Invalid email address';
-            emailError.style.display = 'block';
-            break;
-          case 'auth/user-not-found':
-            emailError.textContent = 'No account found';
-            emailError.style.display = 'block';
-            break;
-          case 'auth/wrong-password':
-            passwordError.textContent = 'Incorrect password';
-            passwordError.style.display = 'block';
-            break;
-          default:
-            alert('Login error: ' + error.message);
-        }
       }
     });
 
     // ✅ Google login
-    const googleBtn = document.querySelector(".social-btn.google");
     googleBtn.addEventListener("click", async () => {
+      loginBtn.classList.add("loading");
+      loginBtn.disabled = true;
       try {
         const provider = new GoogleAuthProvider();
         const cred = await signInWithPopup(auth, provider);
@@ -195,9 +234,14 @@
           createdAt: serverTimestamp()
         });
 
-        window.location.href = "college.html";
+        showToast("Google login successful! Redirecting...", "success");
+        setTimeout(() => {
+          window.location.href = "college.html";
+        }, 2000);
       } catch (err) {
-        alert("Google Sign-In failed: " + err.message);
+        showToast("Google Sign-In failed: " + err.message, "error");
+        loginBtn.classList.remove("loading");
+        loginBtn.disabled = false;
       }
     });
   </script>
