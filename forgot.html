@@ -20,6 +20,27 @@
       margin-top: 10px;
       display: none;
     }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+      position: relative;
+    }
+    .loading::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -12px 0 0 -12px;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -47,7 +68,7 @@
           <div class="success-message" id="successMsg"></div>
         </div>
         
-        <button type="submit" class="auth-btn">Send Reset Link</button>
+        <button type="submit" class="auth-btn" id="resetBtn">Send Reset Link</button>
         
         <div class="auth-footer">
           Remember your password? <a href="login.html">Log in</a>
@@ -65,6 +86,7 @@
     const emailInput = document.getElementById('email');
     const emailError = document.getElementById('emailError');
     const successMsg = document.getElementById('successMsg');
+    const resetBtn = document.getElementById('resetBtn');
 
     forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -78,6 +100,9 @@
         return;
       }
 
+      resetBtn.classList.add("loading");
+      resetBtn.disabled = true;
+
       try {
         // Step 1: Verify if user exists
         const methods = await fetchSignInMethodsForEmail(auth, email);
@@ -87,18 +112,27 @@
           return;
         }
 
-        // Step 2: Send reset email
+        // Step 2: If the user signed in with Google, show message instead
+        if (methods.includes("google.com")) {
+          emailError.textContent = "This account uses Google Sign-In. Please log in with Google.";
+          emailError.style.display = "block";
+          return;
+        }
+
+        // Step 3: Send reset email
         await sendPasswordResetEmail(auth, email);
         successMsg.textContent = "Password reset link has been sent to " + email;
         successMsg.style.display = "block";
 
-        // Optional redirect after a short delay
         setTimeout(() => {
           window.location.href = "login.html";
         }, 3000);
       } catch (error) {
         emailError.textContent = "Error: " + error.message;
         emailError.style.display = "block";
+      } finally {
+        resetBtn.classList.remove("loading");
+        resetBtn.disabled = false;
       }
     });
   </script>
