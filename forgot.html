@@ -8,18 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .error-message {
-      color: #ff3860;
-      font-size: 12px;
-      margin-top: 5px;
-      display: none;
-    }
-    .success-message {
-      color: #28a745;
-      font-size: 13px;
-      margin-top: 10px;
-      display: none;
-    }
     .loading {
       opacity: 0.7;
       pointer-events: none;
@@ -40,6 +28,36 @@
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    /* ✅ Toast styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      min-width: 250px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #ff3860; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
     }
   </style>
 </head>
@@ -64,8 +82,6 @@
             <i class="fas fa-envelope"></i>
             <input type="email" id="email" placeholder="Enter your email" required>
           </div>
-          <div class="error-message" id="emailError"></div>
-          <div class="success-message" id="successMsg"></div>
         </div>
         
         <button type="submit" class="auth-btn" id="resetBtn">Send Reset Link</button>
@@ -77,6 +93,9 @@
     </div>
   </div>
 
+  <!-- ✅ Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script type="module">
     import { auth } from "./firebase-config.js";
     import { sendPasswordResetEmail, fetchSignInMethodsForEmail } 
@@ -84,19 +103,28 @@
 
     const forgotForm = document.querySelector('.auth-form');
     const emailInput = document.getElementById('email');
-    const emailError = document.getElementById('emailError');
-    const successMsg = document.getElementById('successMsg');
     const resetBtn = document.getElementById('resetBtn');
+    const toastContainer = document.getElementById('toastContainer');
+
+    // ✅ Toast function
+    function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = "toast " + type;
+      toast.textContent = message;
+      toastContainer.appendChild(toast);
+
+      // Auto remove after 3.5s
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    }
 
     forgotForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      emailError.style.display = "none";
-      successMsg.style.display = "none";
 
       const email = emailInput.value.trim().toLowerCase();
       if (!email) {
-        emailError.textContent = "Please enter your email address.";
-        emailError.style.display = "block";
+        showToast("Please enter your email address.", "error");
         return;
       }
 
@@ -104,36 +132,28 @@
       resetBtn.disabled = true;
 
       try {
-        // Step 1: Check which providers exist for this email
         const methods = await fetchSignInMethodsForEmail(auth, email);
         console.log("Detected sign-in methods for", email, ":", methods);
 
         if (methods.length === 0) {
-          emailError.textContent = "No account found with this email.";
-          emailError.style.display = "block";
+          showToast("No account found with this email.", "error");
           return;
         }
 
-        // Step 2: Handle Google-only accounts
         if (methods.includes("google.com") && !methods.includes("password")) {
-          emailError.textContent = "This account uses Google Sign-In. Please log in with Google.";
-          emailError.style.display = "block";
+          showToast("This account uses Google Sign-In. Please log in with Google.", "error");
           return;
         }
 
-        // Step 3: Send reset email
         await sendPasswordResetEmail(auth, email);
-        successMsg.textContent = "Password reset link has been sent to " + email;
-        successMsg.style.display = "block";
+        showToast("Password reset link sent to " + email, "success");
 
-        // Redirect after 3s
         setTimeout(() => {
           window.location.href = "login.html";
         }, 3000);
       } catch (error) {
         console.error("Reset error:", error.code, error.message);
-        emailError.textContent = "Error (" + error.code + "): " + error.message;
-        emailError.style.display = "block";
+        showToast("Error (" + error.code + "): " + error.message, "error");
       } finally {
         resetBtn.classList.remove("loading");
         resetBtn.disabled = false;
