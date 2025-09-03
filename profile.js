@@ -23,14 +23,19 @@ onAuthStateChanged(auth, async (user) => {
       const snapshot = await get(ref(db, "users/" + user.uid));
       if (snapshot.exists()) {
         const data = snapshot.val();
+        console.log("Profile data:", data);
         
-        // Update profile header
-        profileName.textContent = data.fullName || "Student";
+        // Update profile header (using correct field names)
+        profileName.textContent = data.name || "Student"; // Changed from fullName to name
         profileCollege.textContent = data.college || "No college selected";
         
-        // Set profile picture
-        if (data.profilePic) {
-          profileAvatar.src = data.profilePic;
+        // Set profile picture (using correct field names)
+        if (data.photolRL) { // Changed from profilePic to photolRL
+          profileAvatar.src = data.photolRL;
+        } else if (data.photoURL) {
+          profileAvatar.src = data.photoURL;
+        } else {
+          profileAvatar.src = "https://randomuser.me/api/portraits/men/32.jpg";
         }
         
         // Update profile details
