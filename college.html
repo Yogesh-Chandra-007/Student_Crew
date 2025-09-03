@@ -29,6 +29,7 @@
             <i class="fas fa-university"></i>
             <select id="college-select" required>
               <option value="">Select your college</option>
+              <option value="VVIT">VVIT, Guntur</option>
               <option value="JNTU-K">JNTU, Kakinada</option>
               <option value="AUCE">AUCE, Visakhapatnam</option>
               <option value="NIT-T">NIT, Tadepalligudem</option>
@@ -39,7 +40,6 @@
               <option value="GITAM">GITAM, Visakhapatnam</option>
               <option value="RVRJC">RVR & JC, Guntur</option>
               <option value="ANITS">ANITS, Visakhapatnam</option>
-              <option value="VVIT">VVIT, Guntur</option>
             </select>
           </div>
         </div>
@@ -49,45 +49,41 @@
     </div>
   </div>
 
- <script type="module">
-  import { auth } from "./firebase-config.js";
-  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <!-- 🔹 Firebase integration script -->
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  // check authentication state
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      // not logged in → redirect
-      window.location.href = "login.html";
-    } else {
-      console.log("User  is logged in:", user.email);
-      // you can also display user's name/email here
-    }
-  });
-
-  // optional: logout button logic
-  document.addEventListener("DOMContentLoaded", () => {
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async () => {
-        await signOut(auth);
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // Not logged in → redirect
         window.location.href = "login.html";
-      });
-    }
-  });
+      }
+    });
 
-  // existing form submission logic
-  document.querySelector('.college-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const college = document.getElementById("college-select").value;
-    if (college) {
-      window.location.href = "dashboard.html";
-    } else {
-      alert("Please select a college first!");
-    }
-  });
-</script>
+    // Save selected college
+    document.querySelector('.college-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const college = document.getElementById("college-select").value;
 
+      if (college) {
+        const user = auth.currentUser;
+        if (user) {
+          try {
+            await update(ref(db, "users/" + user.uid), { college });
+            console.log("College updated:", college);
+            window.location.href = "dashboard.html";
+          } catch (err) {
+            console.error("Error saving college:", err);
+            alert("Could not save college. Try again.");
+          }
+        }
+      } else {
+        alert("Please select a college first!");
+      }
+    });
+  </script>
 </body>
-
 </html>
-
