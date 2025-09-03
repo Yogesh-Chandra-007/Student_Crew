@@ -40,9 +40,10 @@ onAuthStateChanged(auth, async (user) => {
       const snapshot = await get(ref(db, "users/" + user.uid));
       if (snapshot.exists()) {
         const data = snapshot.val();
+        console.log("Loaded user data:", data);
         
-        // Populate form fields with user data
-        document.getElementById("full-name").value = data.fullName || "";
+        // Populate form fields with user data (using correct field names)
+        document.getElementById("full-name").value = data.name || ""; // Changed from fullName to name
         document.getElementById("email").value = data.email || user.email || "";
         document.getElementById("phone").value = data.phone || "";
         document.getElementById("college").value = data.college || "";
@@ -52,8 +53,10 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById("room").value = data.hostel?.room || "";
         
         // Set profile picture if available
-        if (data.profilePic) {
-          profilePreview.src = data.profilePic;
+        if (data.photolRL) { // Changed from profilePic to photolRL
+          profilePreview.src = data.photolRL;
+        } else if (data.photoURL) {
+          profilePreview.src = data.photoURL;
         }
       }
     } catch (error) {
@@ -76,7 +79,7 @@ settingsForm.addEventListener("submit", async (e) => {
   }
 
   // Get form values
-  const fullName = document.getElementById("full-name").value;
+  const name = document.getElementById("full-name").value; // Changed from fullName to name
   const email = document.getElementById("email").value;
   const phone = document.getElementById("phone").value;
   const college = document.getElementById("college").value;
@@ -87,14 +90,14 @@ settingsForm.addEventListener("submit", async (e) => {
 
   try {
     spinner.style.display = "block";
-    let profilePicUrl = null;
+    let photoURL = null;
 
     // Upload new profile picture if selected
     if (newProfilePicFile) {
       try {
         const fileRef = storageRef(storage, `profilePics/${user.uid}`);
         await uploadBytes(fileRef, newProfilePicFile);
-        profilePicUrl = await getDownloadURL(fileRef);
+        photoURL = await getDownloadURL(fileRef);
       } catch (uploadError) {
         console.error("Error uploading profile picture:", uploadError);
         showToast("Error uploading profile picture", "error");
@@ -103,8 +106,8 @@ settingsForm.addEventListener("submit", async (e) => {
 
     // Update Firebase Auth profile
     await updateProfile(user, { 
-      displayName: fullName,
-      ...(profilePicUrl && { photoURL: profilePicUrl })
+      displayName: name,
+      ...(photoURL && { photoURL: photoURL })
     });
     
     // Update email if changed
@@ -112,23 +115,25 @@ settingsForm.addEventListener("submit", async (e) => {
       await updateEmail(user, email);
     }
 
-    // Prepare update data for database
+    // Prepare update data for database (using correct field names)
     const updateData = {
-      fullName,
-      email,
-      phone,
-      college,
-      course,
-      year,
+      name: name, // Changed from fullName to name
+      email: email,
+      phone: phone,
+      college: college,
+      course: course,
+      year: year,
       hostel: { block, room },
       updatedAt: Date.now()
     };
     
     // Add profile picture URL if available
-    if (profilePicUrl) {
-      updateData.profilePic = profilePicUrl;
+    if (photoURL) {
+      updateData.photolRL = photoURL; // Changed from profilePic to photolRL
     }
 
+    console.log("Updating database with:", updateData);
+    
     // Update database
     await update(ref(db, "users/" + user.uid), updateData);
 
