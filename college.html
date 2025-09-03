@@ -7,6 +7,45 @@
   <link rel="stylesheet" href="college.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Spinner */
+    .spinner {
+      display: none;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #4cc9f0;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      animation: spin 1s linear infinite;
+      margin: 15px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast (top-right) */
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: -350px; /* start hidden */
+      min-width: 250px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.5s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .toast.show {
+      right: 20px; /* slide in */
+      opacity: 1;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #dc3545; }
+  </style>
 </head>
 <body>
   <div class="gradient-bg"></div>
@@ -45,43 +84,72 @@
         </div>
         
         <button type="submit" class="college-btn">Continue</button>
+        <div class="spinner" id="spinner"></div>
       </form>
     </div>
   </div>
 
-  <!-- 🔹 Firebase integration script -->
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
   <script type="module">
     import { auth, db } from "./firebase-config.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    // Check authentication state
-    onAuthStateChanged(auth, (user) => {
+    const spinner = document.getElementById("spinner");
+    const toast = document.getElementById("toast");
+    const collegeSelect = document.getElementById("college-select");
+
+    // Show toast
+    function showToast(message, type = "success") {
+      toast.textContent = message;
+      toast.className = "toast " + type + " show";
+      setTimeout(() => {
+        toast.className = "toast " + type;
+      }, 3000);
+    }
+
+    // Load user's saved college
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // Not logged in → redirect
         window.location.href = "login.html";
+      } else {
+        const snapshot = await get(ref(db, "users/" + user.uid));
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          if (data.college) {
+            collegeSelect.value = data.college;
+          }
+        }
       }
     });
 
     // Save selected college
     document.querySelector('.college-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const college = document.getElementById("college-select").value;
+      const college = collegeSelect.value;
 
       if (college) {
         const user = auth.currentUser;
         if (user) {
           try {
+            spinner.style.display = "block";
             await update(ref(db, "users/" + user.uid), { college });
-            console.log("College updated:", college);
-            window.location.href = "dashboard.html";
+            spinner.style.display = "none";
+
+            showToast("College saved successfully!", "success");
+            setTimeout(() => {
+              window.location.href = "dashboard.html";
+            }, 1500);
           } catch (err) {
+            spinner.style.display = "none";
             console.error("Error saving college:", err);
-            alert("Could not save college. Try again.");
+            showToast("Error saving college!", "error");
           }
         }
       } else {
-        alert("Please select a college first!");
+        showToast("Please select a college first!", "error");
       }
     });
   </script>
