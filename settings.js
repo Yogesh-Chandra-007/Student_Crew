@@ -8,7 +8,19 @@ const storage = getStorage();
 const avatarUpload = document.getElementById("avatar-upload");
 const profilePreview = document.getElementById("profile-preview");
 const settingsForm = document.querySelector(".settings-form");
+const spinner = document.getElementById("spinner");
+const toast = document.getElementById("toast");
+
 let newProfilePicFile = null;
+
+// Show toast
+function showToast(message, type = "success") {
+  toast.textContent = message;
+  toast.className = "toast " + type + " show";
+  setTimeout(() => {
+    toast.className = "toast " + type;
+  }, 3000);
+}
 
 // Preview profile picture
 avatarUpload.addEventListener("change", (e) => {
@@ -21,7 +33,7 @@ avatarUpload.addEventListener("change", (e) => {
   }
 });
 
-// Load existing user data
+// Load data
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const snapshot = await get(ref(db, "users/" + user.uid));
@@ -44,7 +56,7 @@ onAuthStateChanged(auth, async (user) => {
 settingsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
-  if (!user) return alert("No user logged in.");
+  if (!user) return showToast("No user logged in!", "error");
 
   const fullName = document.getElementById("full-name").value;
   const email = document.getElementById("email").value;
@@ -56,6 +68,7 @@ settingsForm.addEventListener("submit", async (e) => {
   const room = document.getElementById("room").value;
 
   try {
+    spinner.style.display = "block";
     let profilePicUrl = null;
 
     // Upload new pic
@@ -71,10 +84,10 @@ settingsForm.addEventListener("submit", async (e) => {
       await updateEmail(user, email);
     }
 
-    // Update Realtime Database
+    // Update DB
     await update(ref(db, "users/" + user.uid), {
       fullName,
-      email,   // ✅ email now saved in DB
+      email,
       phone,
       college,
       course,
@@ -83,10 +96,15 @@ settingsForm.addEventListener("submit", async (e) => {
       ...(profilePicUrl && { profilePic: profilePicUrl })
     });
 
-    alert("Profile updated successfully!");
-    window.location.href = "profile.html";
+    spinner.style.display = "none";
+    showToast("Profile updated successfully!", "success");
+
+    setTimeout(() => {
+      window.location.href = "profile.html";
+    }, 1500);
   } catch (err) {
+    spinner.style.display = "none";
     console.error("Error:", err);
-    alert("Update failed: " + err.message);
+    showToast("Update failed: " + err.message, "error");
   }
 });
