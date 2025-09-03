@@ -5,36 +5,28 @@ import { onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebas
 import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const storage = getStorage();
-
-// Elements
 const avatarUpload = document.getElementById("avatar-upload");
 const profilePreview = document.getElementById("profile-preview");
 const settingsForm = document.querySelector(".settings-form");
-
 let newProfilePicFile = null;
 
-// 🔹 Preview profile picture before upload
+// Preview profile picture
 avatarUpload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (file) {
     newProfilePicFile = file;
     const reader = new FileReader();
-    reader.onload = (event) => {
-      profilePreview.src = event.target.result;
-    };
+    reader.onload = (event) => (profilePreview.src = event.target.result);
     reader.readAsDataURL(file);
   }
 });
 
-// 🔹 Load current user data
+// Load data
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const userRef = ref(db, "users/" + user.uid);
-    const snapshot = await get(userRef);
+    const snapshot = await get(ref(db, "users/" + user.uid));
     if (snapshot.exists()) {
       const data = snapshot.val();
-
-      // Fill form fields
       document.getElementById("full-name").value = data.fullName || "";
       document.getElementById("email").value = user.email || "";
       document.getElementById("phone").value = data.phone || "";
@@ -43,20 +35,17 @@ onAuthStateChanged(auth, async (user) => {
       document.getElementById("year").value = data.year || "1";
       document.getElementById("block").value = data.hostel?.block || "";
       document.getElementById("room").value = data.hostel?.room || "";
-      if (data.profilePic) {
-        profilePreview.src = data.profilePic;
-      }
+      if (data.profilePic) profilePreview.src = data.profilePic;
     }
   }
 });
 
-// 🔹 Handle form submit
+// Save changes
 settingsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
   if (!user) return alert("No user logged in.");
 
-  // Collect form data
   const fullName = document.getElementById("full-name").value;
   const email = document.getElementById("email").value;
   const phone = document.getElementById("phone").value;
@@ -66,22 +55,22 @@ settingsForm.addEventListener("submit", async (e) => {
   const block = document.getElementById("block").value;
   const room = document.getElementById("room").value;
 
-  let profilePicUrl = null;
-
   try {
-    // 🔹 If new profile pic selected, upload to Storage
+    let profilePicUrl = null;
+
+    // Upload new pic
     if (newProfilePicFile) {
       const fileRef = storageRef(storage, `profilePics/${user.uid}`);
       await uploadBytes(fileRef, newProfilePicFile);
       profilePicUrl = await getDownloadURL(fileRef);
     }
 
-    // 🔹 Update Firebase Auth Email (if changed)
+    // Update auth email
     if (email !== user.email) {
       await updateEmail(user, email);
     }
 
-    // 🔹 Update Realtime Database
+    // Update DB
     await update(ref(db, "users/" + user.uid), {
       fullName,
       phone,
@@ -89,13 +78,13 @@ settingsForm.addEventListener("submit", async (e) => {
       course,
       year,
       hostel: { block, room },
-      ...(profilePicUrl && { profilePic: profilePicUrl }) // update pic if uploaded
+      ...(profilePicUrl && { profilePic: profilePicUrl })
     });
 
     alert("Profile updated successfully!");
-    window.location.href = "profile.html"; // redirect to profile
-  } catch (error) {
-    console.error("Update failed:", error);
-    alert("Error: " + error.message);
+    window.location.href = "profile.html";
+  } catch (err) {
+    console.error("Error:", err);
+    alert("Update failed: " + err.message);
   }
 });
