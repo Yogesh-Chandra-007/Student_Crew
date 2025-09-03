@@ -1,7 +1,7 @@
 // settings.js
 import { auth, db } from "./firebase-config.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, updateEmail, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const storage = getStorage();
@@ -21,14 +21,14 @@ avatarUpload.addEventListener("change", (e) => {
   }
 });
 
-// Load data
+// Load existing user data
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const snapshot = await get(ref(db, "users/" + user.uid));
     if (snapshot.exists()) {
       const data = snapshot.val();
       document.getElementById("full-name").value = data.fullName || "";
-      document.getElementById("email").value = user.email || "";
+      document.getElementById("email").value = data.email || user.email || "";
       document.getElementById("phone").value = data.phone || "";
       document.getElementById("college").value = data.college || "";
       document.getElementById("course").value = data.course || "";
@@ -65,14 +65,16 @@ settingsForm.addEventListener("submit", async (e) => {
       profilePicUrl = await getDownloadURL(fileRef);
     }
 
-    // Update auth email
+    // Update auth profile + email
+    await updateProfile(user, { displayName: fullName });
     if (email !== user.email) {
       await updateEmail(user, email);
     }
 
-    // Update DB
+    // Update Realtime Database
     await update(ref(db, "users/" + user.uid), {
       fullName,
+      email,   // ✅ email now saved in DB
       phone,
       college,
       course,
@@ -88,4 +90,3 @@ settingsForm.addEventListener("submit", async (e) => {
     alert("Update failed: " + err.message);
   }
 });
-
