@@ -25,21 +25,21 @@ onAuthStateChanged(auth, async (user) => {
         const data = snapshot.val();
         console.log("Profile data:", data);
         
-        // Update profile header (using correct field names)
-        profileName.textContent = data.name || "Student"; // Changed from fullName to name
+        // Update profile header
+        profileName.textContent = data.name || user.displayName || "Student";
         profileCollege.textContent = data.college || "No college selected";
         
-        // Set profile picture (using correct field names)
-        if (data.photolRL) { // Changed from profilePic to photolRL
+        // Set profile picture
+        if (data.photolRL) {
           profileAvatar.src = data.photolRL;
-        } else if (data.photoURL) {
-          profileAvatar.src = data.photoURL;
+        } else if (user.photoURL) {
+          profileAvatar.src = user.photoURL;
         } else {
           profileAvatar.src = "https://randomuser.me/api/portraits/men/32.jpg";
         }
         
         // Update profile details
-        emailField.textContent = user.email || data.email || "Not provided";
+        emailField.textContent = data.email || user.email || "Not provided";
         phoneField.textContent = data.phone || "Not provided";
         collegeField.textContent = data.college || "Not selected";
         courseField.textContent = data.course || "Not provided";
@@ -47,13 +47,22 @@ onAuthStateChanged(auth, async (user) => {
         
         // Format hostel information
         if (data.hostel) {
-          hostelField.textContent = `${data.hostel.block || ""}, Room ${data.hostel.room || ""}`.trim();
-          if (hostelField.textContent === ", Room ") {
-            hostelField.textContent = "Not provided";
-          }
+          const hostelText = `${data.hostel.block || ""}${data.hostel.block && data.hostel.room ? ", " : ""}Room ${data.hostel.room || ""}`.trim();
+          hostelField.textContent = hostelText || "Not provided";
         } else {
           hostelField.textContent = "Not provided";
         }
+      } else {
+        // If no user data exists in database, show auth data
+        profileName.textContent = user.displayName || "Student";
+        emailField.textContent = user.email || "Not provided";
+        
+        // Set default values for other fields
+        phoneField.textContent = "Not provided";
+        collegeField.textContent = "Not selected";
+        courseField.textContent = "Not provided";
+        yearField.textContent = "Not provided";
+        hostelField.textContent = "Not provided";
       }
     } catch (error) {
       console.error("Error loading profile data:", error);
