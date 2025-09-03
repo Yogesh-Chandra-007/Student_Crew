@@ -33,31 +33,49 @@ avatarUpload.addEventListener("change", (e) => {
   }
 });
 
-// Load data
+// Load user data
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const snapshot = await get(ref(db, "users/" + user.uid));
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      document.getElementById("full-name").value = data.fullName || "";
-      document.getElementById("email").value = data.email || user.email || "";
-      document.getElementById("phone").value = data.phone || "";
-      document.getElementById("college").value = data.college || "";
-      document.getElementById("course").value = data.course || "";
-      document.getElementById("year").value = data.year || "1";
-      document.getElementById("block").value = data.hostel?.block || "";
-      document.getElementById("room").value = data.hostel?.room || "";
-      if (data.profilePic) profilePreview.src = data.profilePic;
+    try {
+      const snapshot = await get(ref(db, "users/" + user.uid));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        
+        // Populate form fields with user data
+        document.getElementById("full-name").value = data.fullName || "";
+        document.getElementById("email").value = data.email || user.email || "";
+        document.getElementById("phone").value = data.phone || "";
+        document.getElementById("college").value = data.college || "";
+        document.getElementById("course").value = data.course || "";
+        document.getElementById("year").value = data.year || "1";
+        document.getElementById("block").value = data.hostel?.block || "";
+        document.getElementById("room").value = data.hostel?.room || "";
+        
+        // Set profile picture if available
+        if (data.profilePic) {
+          profilePreview.src = data.profilePic;
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user data:", error);
+      showToast("Error loading profile data", "error");
     }
+  } else {
+    window.location.href = "login.html";
   }
 });
 
-// Save changes
+// Save profile changes
 settingsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const user = auth.currentUser;
-  if (!user) return showToast("No user logged in!", "error");
+  
+  if (!user) {
+    showToast("No user logged in!", "error");
+    return;
+  }
 
+  // Get form values
   const fullName = document.getElementById("full-name").value;
   const email = document.getElementById("email").value;
   const phone = document.getElementById("phone").value;
@@ -71,21 +89,31 @@ settingsForm.addEventListener("submit", async (e) => {
     spinner.style.display = "block";
     let profilePicUrl = null;
 
-    // Upload new pic
+    // Upload new profile picture if selected
     if (newProfilePicFile) {
-      const fileRef = storageRef(storage, `profilePics/${user.uid}`);
-      await uploadBytes(fileRef, newProfilePicFile);
-      profilePicUrl = await getDownloadURL(fileRef);
+      try {
+        const fileRef = storageRef(storage, `profilePics/${user.uid}`);
+        await uploadBytes(fileRef, newProfilePicFile);
+        profilePicUrl = await getDownloadURL(fileRef);
+      } catch (uploadError) {
+        console.error("Error uploading profile picture:", uploadError);
+        showToast("Error uploading profile picture", "error");
+      }
     }
 
-    // Update auth profile + email
-    await updateProfile(user, { displayName: fullName });
+    // Update Firebase Auth profile
+    await updateProfile(user, { 
+      displayName: fullName,
+      ...(profilePicUrl && { photoURL: profilePicUrl })
+    });
+    
+    // Update email if changed
     if (email !== user.email) {
       await updateEmail(user, email);
     }
 
-    // Update DB
-    await update(ref(db, "users/" + user.uid), {
+    // Prepare update data for database
+    const updateData = {
       fullName,
       email,
       phone,
@@ -93,18 +121,33 @@ settingsForm.addEventListener("submit", async (e) => {
       course,
       year,
       hostel: { block, room },
-      ...(profilePicUrl && { profilePic: profilePicUrl })
-    });
+      updatedAt: Date.now()
+    };
+    
+    // Add profile picture URL if available
+    if (profilePicUrl) {
+      updateData.profilePic = profilePicUrl;
+    }
+
+    // Update database
+    await update(ref(db, "users/" + user.uid), updateData);
 
     spinner.style.display = "none";
     showToast("Profile updated successfully!", "success");
 
+    // Redirect to profile page after a short delay
     setTimeout(() => {
       window.location.href = "profile.html";
     }, 1500);
   } catch (err) {
     spinner.style.display = "none";
-    console.error("Error:", err);
-    showToast("Update failed: " + err.message, "error");
+    console.error("Error updating profile:", err);
+    
+    // Handle specific error cases
+    if (err.code === 'auth/requires-recent-login') {
+      showToast("Please log in again to update your email", "error");
+    } else {
+      showToast("Update failed: " + err.message, "error");
+    }
   }
 });
