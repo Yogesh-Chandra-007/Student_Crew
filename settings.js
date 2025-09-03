@@ -88,3 +88,4 @@ settingsForm.addEventListener("submit", async (e) => {
     alert("Update failed: " + err.message);
   }
 });
+
