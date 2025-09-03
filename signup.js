@@ -1,67 +1,61 @@
 // signup.js
 import { auth, db } from "./firebase-config.js";
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-  GoogleAuthProvider,
-  signInWithPopup
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const form = document.querySelector(".auth-form");
-const nameInput = document.getElementById("fullname");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const confirmInput = document.getElementById("confirm-password");
-const termsCheckbox = document.getElementById("terms");
-const googleBtn = document.querySelector(".social-btn.google");
+const signupForm = document.getElementById("signup-form");
+const googleBtn = document.getElementById("google-signup");
 
-form.addEventListener("submit", async (e) => {
+// 📌 Normal email/password signup
+signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (!termsCheckbox.checked) {
-    alert("Please agree to the Terms & Conditions.");
-    return;
-  }
-  if (passwordInput.value !== confirmInput.value) {
-    alert("Passwords do not match!");
-    return;
-  }
+  const nameInput = document.getElementById("name").value;
+  const emailInput = document.getElementById("email").value;
+  const passwordInput = document.getElementById("password").value;
 
   try {
-    const cred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
+    const cred = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
 
-    await updateProfile(cred.user, { displayName: nameInput.value });
-
+    // ✅ Store user data in Realtime Database
     await set(ref(db, "users/" + cred.user.uid), {
       uid: cred.user.uid,
-      name: nameInput.value,
-      email: emailInput.value,
+      fullName: nameInput,   // ✅ fixed
+      email: emailInput,
       createdAt: serverTimestamp()
     });
 
-    window.location.href = "college.html";
+    alert("Signup successful!");
+    window.location.href = "college.html"; // 🔹 go to college selection
   } catch (err) {
-    alert(err.message);
+    console.error("Signup error:", err);
+    alert("Error: " + err.message);
   }
 });
 
-// Google sign up
-googleBtn?.addEventListener("click", async () => {
+// 📌 Google signup
+googleBtn.addEventListener("click", async () => {
+  const provider = new GoogleAuthProvider();
   try {
-    const provider = new GoogleAuthProvider();
     const cred = await signInWithPopup(auth, provider);
 
-    await set(ref(db, "users/" + cred.user.uid), {
-      uid: cred.user.uid,
-      name: cred.user.displayName,
-      email: cred.user.email,
-      photoURL: cred.user.photoURL,
-      createdAt: serverTimestamp()
-    });
+    // Check if user already exists in DB
+    const snapshot = await get(ref(db, "users/" + cred.user.uid));
+    if (!snapshot.exists()) {
+      // ✅ Store new user data
+      await set(ref(db, "users/" + cred.user.uid), {
+        uid: cred.user.uid,
+        fullName: cred.user.displayName || "Student",  // ✅ fixed
+        email: cred.user.email,
+        photoURL: cred.user.photoURL || "default-avatar.png",
+        createdAt: serverTimestamp()
+      });
+    }
 
-    window.location.href = "college.html";
+    alert("Google Signup successful!");
+    window.location.href = "college.html"; // 🔹 go to college selection
   } catch (err) {
-    alert(err.message);
+    console.error("Google signup error:", err);
+    alert("Error: " + err.message);
   }
 });
