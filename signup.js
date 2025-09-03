@@ -17,16 +17,16 @@ signupForm.addEventListener("submit", async (e) => {
   try {
     const cred = await createUserWithEmailAndPassword(auth, emailInput, passwordInput);
 
-    // ✅ Store user data in Realtime Database
+    // ✅ Store user data in Realtime Database with consistent field names
     await set(ref(db, "users/" + cred.user.uid), {
       uid: cred.user.uid,
-      fullName: nameInput,   // ✅ fixed
+      fullName: nameInput,  // ✅ Changed from "name" to "fullName"
       email: emailInput,
       createdAt: serverTimestamp()
     });
 
     alert("Signup successful!");
-    window.location.href = "college.html"; // 🔹 go to college selection
+    window.location.href = "college.html";
   } catch (err) {
     console.error("Signup error:", err);
     alert("Error: " + err.message);
@@ -42,10 +42,10 @@ googleBtn.addEventListener("click", async () => {
     // Check if user already exists in DB
     const snapshot = await get(ref(db, "users/" + cred.user.uid));
     if (!snapshot.exists()) {
-      // ✅ Store new user data
+      // ✅ Store new user data with consistent field names
       await set(ref(db, "users/" + cred.user.uid), {
         uid: cred.user.uid,
-        fullName: cred.user.displayName || "Student",  // ✅ fixed
+        fullName: cred.user.displayName || "Student",  // ✅ Changed from "name" to "fullName"
         email: cred.user.email,
         photoURL: cred.user.photoURL || "default-avatar.png",
         createdAt: serverTimestamp()
@@ -53,7 +53,7 @@ googleBtn.addEventListener("click", async () => {
     }
 
     alert("Google Signup successful!");
-    window.location.href = "college.html"; // 🔹 go to college selection
+    window.location.href = "college.html";
   } catch (err) {
     console.error("Google signup error:", err);
     alert("Error: " + err.message);
