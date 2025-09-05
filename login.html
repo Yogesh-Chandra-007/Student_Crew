@@ -140,7 +140,7 @@
       signInWithPopup,
       fetchSignInMethodsForEmail
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const loginForm = document.getElementById('loginForm');
     const emailInput = document.getElementById('email');
@@ -166,6 +166,29 @@
       passwordInput.setAttribute('type', type);
       this.classList.toggle('fa-eye-slash');
     });
+
+    // Function to redirect user based on college selection status
+    async function redirectUser(user) {
+      try {
+        const snapshot = await get(ref(db, "users/" + user.uid));
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          // If user has already selected a college, go to dashboard
+          if (userData.college) {
+            window.location.href = "dashboard.html";
+          } else {
+            // If no college selected, go to college selection
+            window.location.href = "college.html";
+          }
+        } else {
+          // If user doesn't exist in database, go to college selection
+          window.location.href = "college.html";
+        }
+      } catch (error) {
+        console.error("Error checking user data:", error);
+        window.location.href = "college.html";
+      }
+    }
 
     // Email/Password login with provider check
     loginForm.addEventListener('submit', async (e) => {
@@ -205,12 +228,12 @@
         const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
         await setPersistence(auth, persistence);
 
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         showToast("Login successful! Redirecting...", "success");
 
-        setTimeout(() => {
-          window.location.href = 'college.html';
-        }, 2000);
+        // Redirect based on college selection status
+        await redirectUser(userCredential.user);
+
       } catch (error) {
         showToast("Login failed: " + error.message, "error");
         loginBtn.classList.remove('loading');
@@ -218,7 +241,7 @@
       }
     });
 
-    // ✅ Google login
+    // ✅ Google login - FIXED to prevent duplicate users
     googleBtn.addEventListener("click", async () => {
       loginBtn.classList.add("loading");
       loginBtn.disabled = true;
@@ -226,18 +249,26 @@
         const provider = new GoogleAuthProvider();
         const cred = await signInWithPopup(auth, provider);
 
-        await set(ref(db, "users/" + cred.user.uid), {
-          uid: cred.user.uid,
-          name: cred.user.displayName,
-          email: cred.user.email,
-          photoURL: cred.user.photoURL,
-          createdAt: serverTimestamp()
-        });
+        // Check if user already exists before creating new record
+        const userRef = ref(db, "users/" + cred.user.uid);
+        const snapshot = await get(userRef);
+        
+        if (!snapshot.exists()) {
+          // Only create user if they don't exist
+          await set(userRef, {
+            uid: cred.user.uid,
+            name: cred.user.displayName,
+            email: cred.user.email,
+            photoURL: cred.user.photoURL,
+            createdAt: serverTimestamp()
+          });
+        }
 
         showToast("Google login successful! Redirecting...", "success");
-        setTimeout(() => {
-          window.location.href = "college.html";
-        }, 2000);
+        
+        // Redirect based on college selection status
+        await redirectUser(cred.user);
+        
       } catch (err) {
         showToast("Google Sign-In failed: " + err.message, "error");
         loginBtn.classList.remove("loading");
