@@ -3,460 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Crew - Profile</title>
-  <link rel="stylesheet" href="profile.css">
+  <title>Student Crew - Login</title>
+  <link rel="stylesheet" href="login.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .error-message {
+      color: #ff3860;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+      position: relative;
+    }
+    .loading::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin: -12px 0 0 -12px;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ✅ Toast styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toast {
+      min-width: 250px;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: slideIn 0.4s ease, fadeOut 0.4s ease 3s forwards;
+    }
+    .toast.success { background: #28a745; }
+    .toast.error { background: #ff3860; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(100%); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateX(100%); }
+    }
+  </style>
 </head>
 <body>
   <div class="gradient-bg"></div>
-  
-  <!-- Navigation -->
-  <nav class="main-nav">
-    <div class="nav-brand">
-      <i class="fas fa-users"></i>
-      <span>Student Crew</span>
-    </div>
-    <div class="nav-links">
-      <a href="dashboard.html"><i class="fas fa-home"></i> Home</a>
-      <a href="sell.html"><i class="fas fa-plus-circle"></i> Sell</a>
-      <a href="listings.html"><i class="fas fa-list"></i> My Listings</a>
-      <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
-    </div>
-    <div class="nav-profile" onclick="toggleProfileMenu()">
-      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" id="navProfileImg">
-      <div class="profile-menu" id="profileMenu">
-        <a href="profile.html" class="active"><i class="fas fa-user"></i> Profile</a>
-        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
-        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
-        <div class="divider"></div>
-        <a href="#" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-      </div>
-    </div>
-  </nav>
-
-  <main class="profile-container">
-    <div class="spinner" id="spinner"></div>
-    
-    <div class="profile-header">
-      <div class="profile-avatar">
-        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile Picture" id="profileAvatar">
-        <button class="edit-avatar" onclick="document.getElementById('avatar-upload').click()">
-          <i class="fas fa-camera"></i>
-        </button>
-        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
-      </div>
-      <div class="profile-info">
-        <h1 id="profileName">John Doe</h1>
-        <p class="college" id="profileCollege">VVIT College, Guntur</p>
-        <div class="profile-stats">
-          <div class="stat">
-            <span class="number" id="coinsCount">120</span>
-            <span class="label">Coins</span>
-          </div>
-          <div class="stat">
-            <span class="number" id="friendsCount">18</span>
-            <span class="label">Friends</span>
-          </div>
-          <div class="stat">
-            <span class="number" id="listingsCount">8</span>
-            <span class="label">Listings</span>
-          </div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="logo">
+          <i class="fas fa-users"></i>
+          <span>Student Crew</span>
         </div>
+        <h1>Welcome Back!</h1>
+        <p>Login to access your account</p>
       </div>
-    </div>
 
-    <div class="profile-content">
-      <div class="profile-section">
-        <h2 class="section-title">Personal Information</h2>
-        <div class="info-grid">
-          <div class="info-item">
-            <span class="label">Email</span>
-            <span class="value" id="infoEmail">john.doe@example.com</span>
-            <input type="email" id="inputEmail" class="view-mode" value="john.doe@example.com">
+      <form class="auth-form" id="loginForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-with-icon">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Enter your email" required>
           </div>
-          <div class="info-item">
-            <span class="label">Phone</span>
-            <span class="value" id="infoPhone">+91 9876543210</span>
-            <input type="tel" id="inputPhone" class="view-mode" value="+91 9876543210">
-          </div>
-          <div class="info-item">
-            <span class="label">College</span>
-            <span class="value" id="infoCollege">VVIT, Guntur</span>
-            <select id="inputCollege" class="view-mode">
-              <option value="VVIT">VVIT, Guntur</option>
-              <option value="AUCE">AUCE, Visakhapatnam</option>
-              <option value="GITAM">GITAM, Visakhapatnam</option>
-              <option value="NIT-T">NIT, Tadepalligudem</option>
-            </select>
-          </div>
-          <div class="info-item">
-            <span class="label">Course</span>
-            <span class="value" id="infoCourse">B.Tech Computer Science</span>
-            <input type="text" id="inputCourse" class="view-mode" value="B.Tech Computer Science">
-          </div>
-          <div class="info-item">
-            <span class="label">Year</span>
-            <span class="value" id="infoYear">3rd Year</span>
-            <select id="inputYear" class="view-mode">
-              <option value="1">1st Year</option>
-              <option value="2">2nd Year</option>
-              <option value="3" selected>3rd Year</option>
-              <option value="4">4th Year</option>
-            </select>
-          </div>
-          <div class="info-item">
-            <span class="label">Hostel</span>
-            <span class="value" id="infoHostel">C-Block, Room 204</span>
-            <div class="hostel-inputs view-mode" style="display: none;">
-              <div style="display: flex; gap: 10px;">
-                <input type="text" id="inputBlock" placeholder="Block" value="C-Block" style="flex: 1;">
-                <input type="text" id="inputRoom" placeholder="Room No." value="204" style="flex: 1;">
-              </div>
-            </div>
-          </div>
+          <div class="error-message" id="emailError"></div>
         </div>
-      </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-with-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <i class="fas fa-eye toggle-password"></i>
+          </div>
+          <div class="error-message" id="passwordError"></div>
+        </div>
+
+        <div class="form-options">
+          <div class="remember-me">
+            <input type="checkbox" id="remember">
+            <label for="remember">Remember me</label>
+          </div>
+          <a href="forgot.html" class="forgot-password">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="auth-btn" id="loginBtn">Login</button>
+
+        <div class="auth-divider">
+          <span>or continue with</span>
+        </div>
+
+        <div class="social-auth">
+          <button type="button" class="social-btn google">
+            <i class="fab fa-google"></i> Google
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="signup.html">Sign up</a>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <div class="profile-actions">
-      <button class="btn-primary" id="editProfileBtn" onclick="toggleEditMode()">
-        <i class="fas fa-user-edit"></i> Edit Profile
-      </button>
-      <button class="btn-success" id="saveProfileBtn" onclick="saveProfile()">
-        <i class="fas fa-save"></i> Save Changes
-      </button>
-      <button class="btn-secondary" onclick="window.history.back()">
-        <i class="fas fa-arrow-left"></i> Back
-      </button>
-    </div>
-  </main>
+  <!-- ✅ Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast"></div>
+  <!-- ✅ Helper scripts -->
+  <script type="module">
+    const togglePassword = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+    const toastContainer = document.getElementById("toastContainer");
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-  
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyCkMF2TLoWN-slOPx9uerJMY8D08yP9WK4",
-      authDomain: "sc-database-167c0.firebaseapp.com",
-      databaseURL: "https://sc-database-167c0-default-rtdb.firebaseio.com",
-      projectId: "sc-database-167c0",
-      storageBucket: "sc-database-167c0.appspot.com",
-      messagingSenderId: "233077157231",
-      appId: "1:233077157231:web:027988df72c8c20a288c9a"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
-
-    // DOM elements
-    const spinner = document.getElementById("spinner");
-    const toast = document.getElementById("toast");
-    const profileAvatar = document.getElementById("profileAvatar");
-    const navProfileImg = document.getElementById("navProfileImg");
-    const profileName = document.getElementById("profileName");
-    const profileCollege = document.getElementById("profileCollege");
-    const coinsCount = document.getElementById("coinsCount");
-    const friendsCount = document.getElementById("friendsCount");
-    const listingsCount = document.getElementById("listingsCount");
-    const infoEmail = document.getElementById("infoEmail");
-    const infoPhone = document.getElementById("infoPhone");
-    const infoCollege = document.getElementById("infoCollege");
-    const infoCourse = document.getElementById("infoCourse");
-    const infoYear = document.getElementById("infoYear");
-    const infoHostel = document.getElementById("infoHostel");
-    const editProfileBtn = document.getElementById("editProfileBtn");
-    const saveProfileBtn = document.getElementById("saveProfileBtn");
-
-    // Input elements
-    const inputEmail = document.getElementById("inputEmail");
-    const inputPhone = document.getElementById("inputPhone");
-    const inputCollege = document.getElementById("inputCollege");
-    const inputCourse = document.getElementById("inputCourse");
-    const inputYear = document.getElementById("inputYear");
-    const inputBlock = document.getElementById("inputBlock");
-    const inputRoom = document.getElementById("inputRoom");
-    const hostelInputs = document.querySelector(".hostel-inputs");
-
-    let isEditMode = false;
-    let currentUser = null;
-
-    // Show toast function
+    // ✅ Toast function
     function showToast(message, type = "success") {
+      const toast = document.createElement("div");
+      toast.className = "toast " + type;
       toast.textContent = message;
-      toast.className = "toast " + type + " show";
-      setTimeout(() => {
-        toast.className = "toast " + type;
-      }, 3000);
+      toastContainer.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
     }
+    window.showToast = showToast; // make it accessible in login.js
 
-    // Toggle profile menu
-    function toggleProfileMenu() {
-      const menu = document.getElementById("profileMenu");
-      menu.classList.toggle("active");
-    }
-
-    // Close profile menu when clicking outside
-    document.addEventListener('click', function(event) {
-      const profileMenu = document.getElementById('profileMenu');
-      const profileBtn = document.querySelector('.nav-profile');
-      if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
-        profileMenu.classList.remove('active');
-      }
-    });
-
-    // Logout function
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      }).catch((error) => {
-        console.error("Logout error:", error);
-        showToast("Error signing out", "error");
-      });
-    }
-
-    // Toggle edit mode
-    function toggleEditMode() {
-      isEditMode = !isEditMode;
-      
-      const infoItems = document.querySelectorAll('.info-item');
-      if (isEditMode) {
-        // Switch to edit mode
-        infoItems.forEach(item => {
-          item.classList.add('edit-mode');
-        });
-        
-        // Show hostel inputs
-        hostelInputs.style.display = 'block';
-        
-        editProfileBtn.style.display = 'none';
-        saveProfileBtn.style.display = 'flex';
-      } else {
-        // Switch to view mode
-        infoItems.forEach(item => {
-          item.classList.remove('edit-mode');
-        });
-        
-        // Hide hostel inputs
-        hostelInputs.style.display = 'none';
-        
-        editProfileBtn.style.display = 'flex';
-        saveProfileBtn.style.display = 'none';
-        
-        // Reset values from inputs
-        updateViewFromInputs();
-      }
-    }
-
-    // Update view from input values
-    function updateViewFromInputs() {
-      infoEmail.textContent = inputEmail.value;
-      infoPhone.textContent = inputPhone.value;
-      infoCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
-      infoCourse.textContent = inputCourse.value;
-      
-      // Format year text
-      const yearText = inputYear.value === "1" ? "1st Year" : 
-                      inputYear.value === "2" ? "2nd Year" :
-                      inputYear.value === "3" ? "3rd Year" : "4th Year";
-      infoYear.textContent = yearText;
-      
-      // Format hostel information
-      const blockText = inputBlock.value ? inputBlock.value : "";
-      const roomText = inputRoom.value ? `Room ${inputRoom.value}` : "";
-      const separator = (blockText && roomText) ? ", " : "";
-      infoHostel.textContent = blockText + separator + roomText || "Not provided";
-    }
-
-    // Save profile to Firebase
-    function saveProfile() {
-      spinner.style.display = "block";
-      
-      const user = auth.currentUser;
-      if (!user) {
-        showToast("You must be logged in to save changes", "error");
-        spinner.style.display = "none";
-        return;
-      }
-
-      const updates = {
-        name: profileName.textContent,
-        email: inputEmail.value,
-        phone: inputPhone.value,
-        college: inputCollege.value,
-        course: inputCourse.value,
-        year: inputYear.value,
-        hostel: {
-          block: inputBlock.value,
-          room: inputRoom.value
-        },
-        updatedAt: Date.now()
-      };
-
-      // Update Firebase database
-      db.ref('users/' + user.uid).update(updates)
-        .then(() => {
-          spinner.style.display = "none";
-          showToast("Profile updated successfully!");
-          
-          // Update view values
-          updateViewFromInputs();
-          
-          // Update college in profile header
-          profileCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
-          
-          // Exit edit mode
-          isEditMode = false;
-          toggleEditMode();
-        })
-        .catch((error) => {
-          spinner.style.display = "none";
-          console.error("Error updating profile:", error);
-          showToast("Error updating profile: " + error.message, "error");
-        });
-    }
-
-    // Load user data from Firebase
-    function loadUserData() {
-      spinner.style.display = "block";
-      
-      const user = auth.currentUser;
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Reference to user data in database
-      const userRef = db.ref("users/" + user.uid);
-      
-      userRef.once('value')
-        .then((snapshot) => {
-          spinner.style.display = "none";
-          
-          if (snapshot.exists()) {
-            const userData = snapshot.val();
-            
-            // Update profile information
-            profileName.textContent = userData.name || user.displayName || "Student";
-            profileCollege.textContent = userData.college || "No college selected";
-            
-            // Update stats
-            coinsCount.textContent = userData.coins || 0;
-            friendsCount.textContent = userData.friends ? Object.keys(userData.friends).length : 0;
-            listingsCount.textContent = userData.listings ? Object.keys(userData.listings).length : 0;
-            
-            // Update personal information
-            infoEmail.textContent = userData.email || user.email || "Not provided";
-            infoPhone.textContent = userData.phone || "Not provided";
-            infoCollege.textContent = userData.college || "Not selected";
-            infoCourse.textContent = userData.course || "Not provided";
-            
-            // Format year text
-            if (userData.year) {
-              const yearText = userData.year === "1" ? "1st Year" : 
-                              userData.year === "2" ? "2nd Year" :
-                              userData.year === "3" ? "3rd Year" : "4th Year";
-              infoYear.textContent = yearText;
-            } else {
-              infoYear.textContent = "Not provided";
-            }
-            
-            // Format hostel information
-            if (userData.hostel) {
-              const blockText = userData.hostel.block || "";
-              const roomText = userData.hostel.room ? `Room ${userData.hostel.room}` : "";
-              const separator = (blockText && roomText) ? ", " : "";
-              infoHostel.textContent = blockText + separator + roomText || "Not provided";
-            } else {
-              infoHostel.textContent = "Not provided";
-            }
-            
-            // Set input values
-            inputEmail.value = userData.email || user.email || "";
-            inputPhone.value = userData.phone || "";
-            inputCourse.value = userData.course || "";
-            inputYear.value = userData.year || "1";
-            inputBlock.value = userData.hostel?.block || "";
-            inputRoom.value = userData.hostel?.room || "";
-            
-            // Select the correct college
-            if (userData.college) {
-              for (let i = 0; i < inputCollege.options.length; i++) {
-                if (inputCollege.options[i].value === userData.college) {
-                  inputCollege.selectedIndex = i;
-                  break;
-                }
-              }
-            }
-            
-            // Update profile picture if available
-            if (userData.photolRL) {
-              profileAvatar.src = userData.photolRL;
-              navProfileImg.src = userData.photolRL;
-            } else if (user.photoURL) {
-              profileAvatar.src = user.photoURL;
-              navProfileImg.src = user.photoURL;
-            }
-          } else {
-            // If no user data exists, use auth data
-            profileName.textContent = user.displayName || "Student";
-            infoEmail.textContent = user.email || "Not provided";
-            inputEmail.value = user.email || "";
-            
-            // Set default values for other fields
-            infoPhone.textContent = "Not provided";
-            infoCollege.textContent = "Not selected";
-            infoCourse.textContent = "Not provided";
-            infoYear.textContent = "Not provided";
-            infoHostel.textContent = "Not provided";
-            
-            showToast("No user data found. Please update your profile.", "error");
-          }
-        })
-        .catch((error) => {
-          spinner.style.display = "none";
-          console.error("Error loading user data:", error);
-          showToast("Error loading profile data", "error");
-        });
-    }
-
-    // Avatar upload preview
-    const avatarUpload = document.getElementById('avatar-upload');
-    
-    avatarUpload.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          profileAvatar.src = event.target.result;
-          navProfileImg.src = event.target.result;
-          
-          // Here you would typically upload to Firebase Storage
-          // and update the user's profile picture URL in the database
-          showToast("Profile picture updated", "success");
-        }
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Check auth state and load data
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        loadUserData();
-      } else {
-        window.location.href = "login.html";
-      }
+    // ✅ Toggle password visibility
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
     });
   </script>
+
+  <!-- Core login logic -->
+  <script type="module" src="login.js"></script>
 </body>
 </html>
