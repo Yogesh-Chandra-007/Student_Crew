@@ -29,9 +29,9 @@ onAuthStateChanged(auth, async (user) => {
         profileName.textContent = data.name || user.displayName || "Student";
         profileCollege.textContent = data.college || "No college selected";
         
-        // Set profile picture
-        if (data.photolRL) {
-          profileAvatar.src = data.photolRL;
+        // Set profile picture - FIXED THE TYPO HERE
+        if (data.photoURL) {
+          profileAvatar.src = data.photoURL;
         } else if (user.photoURL) {
           profileAvatar.src = user.photoURL;
         } else {
