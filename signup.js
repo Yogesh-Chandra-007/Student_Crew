@@ -1,3 +1,5 @@
+// signup.js
+
 import { auth, db } from "./firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
@@ -18,7 +20,7 @@ const signupBtn = document.getElementById('signupBtn');
 const togglePassword = document.querySelector('.toggle-password');
 const googleBtn = document.querySelector(".social-btn.google");
 
-// ✅ Toast function (safe)
+// ✅ Toast
 const toastContainer = document.getElementById("toastContainer") || (() => {
   const div = document.createElement("div");
   div.id = "toastContainer";
@@ -34,16 +36,16 @@ function showToast(message, type = "success") {
   setTimeout(() => toast.remove(), 3500);
 }
 
-// ✅ Toggle password visibility (safe)
+// ✅ Toggle password visibility
 if (togglePassword) {
-  togglePassword.addEventListener('click', function() {
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    this.classList.toggle('fa-eye-slash');
+  togglePassword.addEventListener("click", function () {
+    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+    passwordInput.setAttribute("type", type);
+    this.classList.toggle("fa-eye-slash");
   });
 }
 
-// ✅ Check if email already exists in Firebase Auth
+// ✅ Check if email exists before creating user
 async function checkEmailExists(email) {
   try {
     const methods = await fetchSignInMethodsForEmail(auth, email);
@@ -54,8 +56,8 @@ async function checkEmailExists(email) {
   }
 }
 
-// ✅ Signup handler
-signupForm.addEventListener('submit', async (e) => {
+// ✅ Signup form submit
+signupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (!termsCheckbox.checked) {
@@ -82,13 +84,13 @@ signupForm.addEventListener('submit', async (e) => {
 
     const userRef = ref(db, "users/" + cred.user.uid);
     const snapshot = await get(userRef);
-    
+
     if (!snapshot.exists()) {
       await set(userRef, {
         uid: cred.user.uid,
         name: fullnameInput.value,
         email: emailInput.value,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
     }
 
@@ -97,7 +99,7 @@ signupForm.addEventListener('submit', async (e) => {
       window.location.href = "college.html";
     }, 2000);
   } catch (error) {
-    if (error.code === 'auth/email-already-in-use') {
+    if (error.code === "auth/email-already-in-use") {
       showToast("This email is already registered. Please login instead.", "error");
     } else {
       showToast("Signup failed: " + error.message, "error");
@@ -112,20 +114,21 @@ signupForm.addEventListener('submit', async (e) => {
 googleBtn.addEventListener("click", async () => {
   signupBtn.classList.add("loading");
   signupBtn.disabled = true;
+
   try {
     const provider = new GoogleAuthProvider();
     const cred = await signInWithPopup(auth, provider);
 
     const userRef = ref(db, "users/" + cred.user.uid);
     const snapshot = await get(userRef);
-    
+
     if (!snapshot.exists()) {
       await set(userRef, {
         uid: cred.user.uid,
         name: cred.user.displayName,
         email: cred.user.email,
         photoURL: cred.user.photoURL,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
     }
 
