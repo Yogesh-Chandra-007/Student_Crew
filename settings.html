@@ -4,63 +4,6 @@
   <meta charset="UTF-8">
   <title>Settings - Student Crew</title>
   <link rel="stylesheet" href="styles.css">
-  <style>
-    .settings-container {
-      max-width: 800px;
-      margin: 40px auto;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 16px;
-      padding: 20px;
-      backdrop-filter: blur(10px);
-    }
-    .tabs {
-      display: flex;
-      border-bottom: 1px solid #444;
-    }
-    .tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #aaa;
-      transition: color 0.3s;
-    }
-    .tab.active { color: #fff; border-bottom: 2px solid #0ff; }
-    .tab-content { display: none; padding: 20px 10px; }
-    .tab-content.active { display: block; }
-    .form-group { margin-bottom: 12px; }
-    label { display: block; font-size: 14px; margin-bottom: 4px; }
-    input, select {
-      width: 100%; padding: 8px; border-radius: 8px;
-      border: none; outline: none;
-    }
-    button {
-      background: #0ff; color: #000; border: none;
-      padding: 10px 18px; border-radius: 8px;
-      cursor: pointer; font-weight: bold;
-    }
-    button:hover { opacity: 0.8; }
-    .danger-btn { background: #ff4444; color: white; }
-    #toast {
-      visibility: hidden;
-      min-width: 250px;
-      margin-left: -125px;
-      background-color: #333;
-      color: #fff;
-      text-align: center;
-      border-radius: 8px;
-      padding: 12px;
-      position: fixed;
-      z-index: 1;
-      left: 50%;
-      bottom: 30px;
-      font-size: 14px;
-    }
-    #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-    @keyframes fadein { from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; } }
-    @keyframes fadeout { from { bottom: 30px; opacity: 1; } to { bottom: 0; opacity: 0; } }
-  </style>
 </head>
 <body>
   <div class="settings-container">
@@ -141,3 +84,4 @@
   <script type="module" src="settings.js"></script>
 </body>
 </html>
+
