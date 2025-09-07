@@ -1,11 +1,14 @@
-// signup.js - Fully Fixed Version with Safe Google Signup
+// signup.js - Updated Version
 import { auth, db } from "./firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
   GoogleAuthProvider, 
   signInWithPopup,
   fetchSignInMethodsForEmail,
-  updateProfile
+  updateProfile,
+  setPersistence,
+  browserSessionPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
@@ -19,18 +22,7 @@ const confirmPasswordInput = document.getElementById("confirm-password");
 const termsCheckbox = document.getElementById("terms");
 const signupBtn = document.getElementById("signupBtn");
 
-// Constants
-const ERROR_MESSAGES = {
-  EMAIL_EXISTS: "This email is already registered. Please login instead.",
-  WEAK_PASSWORD: "Password should be at least 6 characters.",
-  INVALID_EMAIL: "Please enter a valid email address.",
-  PASSWORDS_MISMATCH: "Passwords do not match.",
-  TERMS_NOT_AGREED: "Please agree to the Terms & Conditions.",
-  NETWORK_ERROR: "Network error. Please check your connection.",
-  DEFAULT: "An error occurred. Please try again."
-};
-
-// Toast function
+// Toast function (same as login)
 const showToast = (message, type = "success") => {
   const toastContainer = document.getElementById("toastContainer");
   if (toastContainer) {
@@ -40,16 +32,16 @@ const showToast = (message, type = "success") => {
     toastContainer.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
   } else {
-    alert(message); // fallback
+    alert(message);
   }
 };
 
-// Loading state for buttons
+// Loading state
 const setLoadingState = (isLoading) => {
   [signupBtn, googleBtn].forEach(btn => {
     if (btn) {
       btn.disabled = isLoading;
-      btn.classList.toggle("loading", isLoading);
+      isLoading ? btn.classList.add("loading") : btn.classList.remove("loading");
     }
   });
 };
@@ -61,26 +53,26 @@ const validateForm = (name, email, password, confirmPassword, termsAgreed) => {
     return false;
   }
   if (!termsAgreed) {
-    showToast(ERROR_MESSAGES.TERMS_NOT_AGREED, "error");
+    showToast("Please agree to the Terms & Conditions.", "error");
     return false;
   }
   if (password !== confirmPassword) {
-    showToast(ERROR_MESSAGES.PASSWORDS_MISMATCH, "error");
+    showToast("Passwords do not match.", "error");
     return false;
   }
   if (password.length < 6) {
-    showToast(ERROR_MESSAGES.WEAK_PASSWORD, "error");
+    showToast("Password should be at least 6 characters.", "error");
     return false;
   }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    showToast(ERROR_MESSAGES.INVALID_EMAIL, "error");
+    showToast("Please enter a valid email address.", "error");
     return false;
   }
   return true;
 };
 
-// Check if email exists
+// Check email
 const checkEmailExists = async (email) => {
   try {
     const methods = await fetchSignInMethodsForEmail(auth, email);
@@ -96,6 +88,7 @@ const createUserInDatabase = async (user, additionalData = {}) => {
   try {
     const userRef = ref(db, "users/" + user.uid);
     const snapshot = await get(userRef);
+
     if (!snapshot.exists()) {
       await set(userRef, {
         uid: user.uid,
@@ -106,43 +99,28 @@ const createUserInDatabase = async (user, additionalData = {}) => {
         ...additionalData
       });
     }
-    return true;
   } catch (error) {
     console.error("Error creating user in database:", error);
     throw error;
   }
 };
 
-// Signup success
-const handleSignupSuccess = () => {
-  showToast("Account created successfully! Redirecting...", "success");
-  setTimeout(() => window.location.href = "college.html", 2000);
-};
-
-// Signup error
-const handleSignupError = (error) => {
-  console.error("Signup error:", error);
-  switch (error.code) {
-    case 'auth/email-already-in-use':
-      showToast(ERROR_MESSAGES.EMAIL_EXISTS, "error");
-      break;
-    case 'auth/weak-password':
-      showToast(ERROR_MESSAGES.WEAK_PASSWORD, "error");
-      break;
-    case 'auth/invalid-email':
-      showToast(ERROR_MESSAGES.INVALID_EMAIL, "error");
-      break;
-    case 'auth/network-request-failed':
-      showToast(ERROR_MESSAGES.NETWORK_ERROR, "error");
-      break;
-    case 'auth/popup-closed-by-user':
-      break; // ignore
-    default:
-      showToast(ERROR_MESSAGES.DEFAULT, "error");
+// Redirect logic (same as login)
+const redirectUser = async (user) => {
+  try {
+    const snapshot = await get(ref(db, "users/" + user.uid));
+    if (snapshot.exists() && snapshot.val().college?.trim()) {
+      window.location.href = "dashboard.html";
+    } else {
+      window.location.href = "college.html";
+    }
+  } catch (error) {
+    console.error(error);
+    window.location.href = "college.html";
   }
 };
 
-// Email signup handler
+// Email signup
 const handleEmailSignup = async (e) => {
   e.preventDefault();
   const name = nameInput.value.trim();
@@ -154,9 +132,10 @@ const handleEmailSignup = async (e) => {
   if (!validateForm(name, email, password, confirmPassword, termsAgreed)) return;
 
   setLoadingState(true);
+
   try {
     if (await checkEmailExists(email)) {
-      showToast(ERROR_MESSAGES.EMAIL_EXISTS, "error");
+      showToast("This email is already registered. Please login instead.", "error");
       setLoadingState(false);
       return;
     }
@@ -164,45 +143,54 @@ const handleEmailSignup = async (e) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName: name });
     await createUserInDatabase(userCredential.user, { fullName: name });
-    handleSignupSuccess();
-  } catch (error) {
-    handleSignupError(error);
+    showToast("Account created successfully! Redirecting...", "success");
+    await redirectUser(userCredential.user);
+  } catch (err) {
+    console.error(err);
+    showToast("Signup failed: " + err.message, "error");
+  } finally {
     setLoadingState(false);
   }
 };
 
-// Google signup handler - safe version
+// Google signup
 const handleGoogleSignup = async () => {
   setLoadingState(true);
+
   try {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+    provider.addScope('profile');
+    provider.addScope('email');
 
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
+    const cred = await signInWithPopup(auth, provider);
 
-    const userRef = ref(db, "users/" + user.uid);
+    // Check if user exists, if not create record
+    const userRef = ref(db, "users/" + cred.user.uid);
     const snapshot = await get(userRef);
-
     if (!snapshot.exists()) {
-      await createUserInDatabase(user, { fullName: user.displayName || "Student" });
-      console.log("New Google user created in DB");
-    } else {
-      console.log("Google user already exists in DB");
+      await set(userRef, {
+        uid: cred.user.uid,
+        fullName: cred.user.displayName,
+        email: cred.user.email,
+        photoURL: cred.user.photoURL,
+        createdAt: serverTimestamp(),
+      });
     }
 
-    handleSignupSuccess();
-  } catch (error) {
-    console.error("Google signup error:", error);
-    handleSignupError(error);
+    showToast("Google signup successful! Redirecting...", "success");
+    await redirectUser(cred.user);
+  } catch (err) {
+    console.error(err);
+    showToast("Google signup failed: " + err.message, "error");
+  } finally {
     setLoadingState(false);
   }
 };
 
-// Initialize event listeners
+// Initialize
 const initializeSignup = () => {
   signupForm?.addEventListener("submit", handleEmailSignup);
-  if (googleBtn) googleBtn.addEventListener("click", handleGoogleSignup);
+  googleBtn?.addEventListener("click", handleGoogleSignup);
 
   // Password toggle
   const passwordToggle = document.querySelector('.toggle-password');
@@ -215,9 +203,8 @@ const initializeSignup = () => {
   }
 };
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeSignup);
 } else {
   initializeSignup();
-};
+}
