@@ -186,24 +186,25 @@
 
     // Redirect user based on college selection
     async function redirectUser(user) {
-      try {
-        const snapshot = await get(ref(db, "users/" + user.uid));
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          if (userData.college) {
-            window.location.href = "dashboard.html";
-          } else {
-            window.location.href = "college.html";
-          }
-        } else {
-          window.location.href = "college.html";
-        }
-      } catch (error) {
-        console.error("Error checking user data:", error);
-        showToast("Error checking user data", "error");
+  try {
+    const snapshot = await get(ref(db, "users/" + user.uid));
+    if (snapshot.exists()) {
+      const userData = snapshot.val();
+      // Check if college field exists AND has a value
+      if (userData.college && userData.college.trim() !== "") {
+        window.location.href = "dashboard.html";
+      } else {
         window.location.href = "college.html";
       }
+    } else {
+      window.location.href = "college.html";
     }
+  } catch (error) {
+    console.error("Error checking user data:", error);
+    showToast("Error checking user data", "error");
+    window.location.href = "college.html";
+  }
+}
 
     // Email/Password login
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
