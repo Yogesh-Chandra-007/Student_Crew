@@ -1,5 +1,5 @@
 // login.js
-import { auth } from "./firebase-config.js";
+import { auth, db } from "./firebase-config.js";  // ✅ use central config
 import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
@@ -16,24 +16,24 @@ const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const rememberCheckbox = document.getElementById("remember");
 const loginBtn = document.getElementById("loginBtn");
-const googleBtn = document.querySelector(".social-btn.google");
+const googleBtn = document.getElementById("googleLoginBtn");
 
-// ✅ Toast function (from login.html, exposed globally)
+// ✅ Toast function (provided by login.html)
 function showToast(message, type = "success") {
   if (typeof window.showToast === "function") {
     window.showToast(message, type);
   } else {
-    alert(message); // fallback if toast not loaded
+    alert(message); // fallback
   }
 }
 
-// Redirect user based on college selection
+// ✅ Unified redirect logic
 async function redirectUser(user) {
   try {
     const snapshot = await get(ref(db, "users/" + user.uid));
     if (snapshot.exists()) {
       const userData = snapshot.val();
-      if (userData.college) {
+      if (userData.college && userData.college.trim() !== "") {
         window.location.href = "dashboard.html";
       } else {
         window.location.href = "college.html";
@@ -43,6 +43,7 @@ async function redirectUser(user) {
     }
   } catch (error) {
     console.error("Error checking user data:", error);
+    showToast("Error checking user data", "error");
     window.location.href = "college.html";
   }
 }
@@ -67,11 +68,7 @@ form?.addEventListener("submit", async (e) => {
       : browserSessionPersistence;
     await setPersistence(auth, persistence);
 
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
     showToast("Login successful! Redirecting...", "success");
     await redirectUser(userCredential.user);
