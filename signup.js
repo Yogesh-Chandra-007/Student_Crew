@@ -1,52 +1,82 @@
-// signup.js
-
+// signup.js - Upgraded Version
 import { auth, db } from "./firebase-config.js";
 import { 
   createUserWithEmailAndPassword, 
-  updateProfile, 
   GoogleAuthProvider, 
   signInWithPopup,
-  fetchSignInMethodsForEmail
+  fetchSignInMethodsForEmail,
+  updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const signupForm = document.getElementById('signupForm');
-const fullnameInput = document.getElementById('fullname');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const confirmPasswordInput = document.getElementById('confirm-password');
-const termsCheckbox = document.getElementById('terms');
-const signupBtn = document.getElementById('signupBtn');
-const togglePassword = document.querySelector('.toggle-password');
-const googleBtn = document.querySelector(".social-btn.google");
+// DOM Elements
+const signupForm = document.getElementById("signup-form");
+const googleBtn = document.getElementById("google-signup");
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const confirmPasswordInput = document.getElementById("confirm-password");
+const termsCheckbox = document.getElementById("terms");
+const signupBtn = document.getElementById("signupBtn");
 
-// ✅ Toast
-const toastContainer = document.getElementById("toastContainer") || (() => {
-  const div = document.createElement("div");
-  div.id = "toastContainer";
-  document.body.appendChild(div);
-  return div;
-})();
+// Constants
+const ERROR_MESSAGES = {
+  EMAIL_EXISTS: "This email is already registered. Please login instead.",
+  WEAK_PASSWORD: "Password should be at least 6 characters.",
+  INVALID_EMAIL: "Please enter a valid email address.",
+  PASSWORDS_MISMATCH: "Passwords do not match.",
+  TERMS_NOT_AGREED: "Please agree to the Terms & Conditions.",
+  NETWORK_ERROR: "Network error. Please check your connection.",
+  DEFAULT: "An error occurred. Please try again."
+};
 
-function showToast(message, type = "success") {
-  const toast = document.createElement("div");
-  toast.className = "toast " + type;
-  toast.textContent = message;
-  toastContainer.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
-}
+// Utility Functions
+const showToast = (message, type = "success") => {
+  if (typeof window.showToast === "function") {
+    window.showToast(message, type);
+  } else {
+    alert(message); // fallback
+  }
+};
 
-// ✅ Toggle password visibility
-if (togglePassword) {
-  togglePassword.addEventListener("click", function () {
-    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-    passwordInput.setAttribute("type", type);
-    this.classList.toggle("fa-eye-slash");
-  });
-}
+const setLoadingState = (isLoading) => {
+  if (signupBtn) {
+    signupBtn.disabled = isLoading;
+    signupBtn.classList.toggle("loading", isLoading);
+  }
+};
 
-// ✅ Check if email exists before creating user
-async function checkEmailExists(email) {
+const validateForm = (name, email, password, confirmPassword, termsAgreed) => {
+  if (!name || !email || !password || !confirmPassword) {
+    showToast("Please fill in all fields.", "error");
+    return false;
+  }
+
+  if (!termsAgreed) {
+    showToast(ERROR_MESSAGES.TERMS_NOT_AGREED, "error");
+    return false;
+  }
+
+  if (password !== confirmPassword) {
+    showToast(ERROR_MESSAGES.PASSWORDS_MISMATCH, "error");
+    return false;
+  }
+
+  if (password.length < 6) {
+    showToast(ERROR_MESSAGES.WEAK_PASSWORD, "error");
+    return false;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    showToast(ERROR_MESSAGES.INVALID_EMAIL, "error");
+    return false;
+  }
+
+  return true;
+};
+
+const checkEmailExists = async (email) => {
   try {
     const methods = await fetchSignInMethodsForEmail(auth, email);
     return methods.length > 0;
@@ -54,261 +84,148 @@ async function checkEmailExists(email) {
     console.error("Error checking email:", error);
     return false;
   }
-}
+};
 
-// ✅ Signup form submit
-signupForm.addEventListener("submit", async (e) => {
+const createUserInDatabase = async (user, additionalData = {}) => {
+  try {
+    const userRef = ref(db, "users/" + user.uid);
+    const snapshot = await get(userRef);
+    
+    if (!snapshot.exists()) {
+      await set(userRef, {
+        uid: user.uid,
+        fullName: additionalData.fullName || user.displayName || "Student",
+        email: user.email,
+        photoURL: user.photoURL || "default-avatar.png",
+        createdAt: serverTimestamp(),
+        ...additionalData
+      });
+    }
+    return true;
+  } catch (error) {
+    console.error("Error creating user in database:", error);
+    throw error;
+  }
+};
+
+const handleSignupSuccess = (user) => {
+  showToast("Account created successfully! Redirecting...", "success");
+  setTimeout(() => {
+    window.location.href = "college.html";
+  }, 2000);
+};
+
+const handleSignupError = (error) => {
+  console.error("Signup error:", error);
+  
+  switch (error.code) {
+    case 'auth/email-already-in-use':
+      showToast(ERROR_MESSAGES.EMAIL_EXISTS, "error");
+      break;
+    case 'auth/weak-password':
+      showToast(ERROR_MESSAGES.WEAK_PASSWORD, "error");
+      break;
+    case 'auth/invalid-email':
+      showToast(ERROR_MESSAGES.INVALID_EMAIL, "error");
+      break;
+    case 'auth/network-request-failed':
+      showToast(ERROR_MESSAGES.NETWORK_ERROR, "error");
+      break;
+    default:
+      showToast(ERROR_MESSAGES.DEFAULT, "error");
+  }
+};
+
+// Event Handlers
+const handleEmailSignup = async (e) => {
   e.preventDefault();
 
-  if (!termsCheckbox.checked) {
-    showToast("Please agree to the Terms & Conditions.", "error");
-    return;
-  }
-  if (passwordInput.value !== confirmPasswordInput.value) {
-    showToast("Passwords do not match!", "error");
+  const name = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const confirmPassword = confirmPasswordInput.value;
+  const termsAgreed = termsCheckbox.checked;
+
+  if (!validateForm(name, email, password, confirmPassword, termsAgreed)) {
     return;
   }
 
-  signupBtn.classList.add("loading");
-  signupBtn.disabled = true;
+  setLoadingState(true);
 
   try {
-    const emailExists = await checkEmailExists(emailInput.value);
+    // Check if email already exists
+    const emailExists = await checkEmailExists(email);
     if (emailExists) {
-      showToast("This email is already registered. Please login instead.", "error");
+      showToast(ERROR_MESSAGES.EMAIL_EXISTS, "error");
+      setLoadingState(false);
       return;
     }
 
-    const cred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    await updateProfile(cred.user, { displayName: fullnameInput.value });
-
-    const userRef = ref(db, "users/" + cred.user.uid);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      // ✅ Save all required fields with defaults
-      await set(userRef, {
-        uid: cred.user.uid,
-        name: fullnameInput.value,
-        email: emailInput.value,
-        college: "Not set",
-        course: "Not set",
-        year: "Not set",
-        block: "Not set",
-        roomNumber: "Not set",
-        createdAt: serverTimestamp(),
-      });
-    }
-
-    showToast("Account created successfully! Redirecting...", "success");
-    setTimeout(() => {
-      window.location.href = "college.html";
-    }, 2000);
+    // Create user with email and password
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Update profile with display name
+    await updateProfile(userCredential.user, { displayName: name });
+    
+    // Create user record in database
+    await createUserInDatabase(userCredential.user, { fullName: name });
+    
+    handleSignupSuccess(userCredential.user);
   } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      showToast("This email is already registered. Please login instead.", "error");
-    } else {
-      showToast("Signup failed: " + error.message, "error");
-    }
-  } finally {
-    signupBtn.classList.remove("loading");
-    signupBtn.disabled = false;
+    handleSignupError(error);
+    setLoadingState(false);
   }
-});
+};
 
-// ✅ Google signup
-googleBtn.addEventListener("click", async () => {
-  signupBtn.classList.add("loading");
-  signupBtn.disabled = true;
+const handleGoogleSignup = async () => {
+  setLoadingState(true);
 
   try {
     const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-
-    const userRef = ref(db, "users/" + cred.user.uid);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      // ✅ Save all required fields with defaults
-      await set(userRef, {
-        uid: cred.user.uid,
-        name: cred.user.displayName,
-        email: cred.user.email,
-        photoURL: cred.user.photoURL,
-        college: "Not set",
-        course: "Not set",
-        year: "Not set",
-        block: "Not set",
-        roomNumber: "Not set",
-        createdAt: serverTimestamp(),
-      });
-    }
-
-    showToast("Google signup successful! Redirecting...", "success");
-    setTimeout(() => {
-      window.location.href = "college.html";
-    }, 2000);
-  } catch (err) {
-    showToast("Google signup failed: " + err.message, "error");
-  } finally {
-    signupBtn.classList.remove("loading");
-    signupBtn.disabled = false;
-  }
-});
-// signup.js
-
-import { auth, db } from "./firebase-config.js";
-import { 
-  createUserWithEmailAndPassword, 
-  updateProfile, 
-  GoogleAuthProvider, 
-  signInWithPopup,
-  fetchSignInMethodsForEmail
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { ref, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const signupForm = document.getElementById('signupForm');
-const fullnameInput = document.getElementById('fullname');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const confirmPasswordInput = document.getElementById('confirm-password');
-const termsCheckbox = document.getElementById('terms');
-const signupBtn = document.getElementById('signupBtn');
-const togglePassword = document.querySelector('.toggle-password');
-const googleBtn = document.querySelector(".social-btn.google");
-
-// ✅ Toast
-const toastContainer = document.getElementById("toastContainer") || (() => {
-  const div = document.createElement("div");
-  div.id = "toastContainer";
-  document.body.appendChild(div);
-  return div;
-})();
-
-function showToast(message, type = "success") {
-  const toast = document.createElement("div");
-  toast.className = "toast " + type;
-  toast.textContent = message;
-  toastContainer.appendChild(toast);
-  setTimeout(() => toast.remove(), 3500);
-}
-
-// ✅ Toggle password visibility
-if (togglePassword) {
-  togglePassword.addEventListener("click", function () {
-    const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
-    passwordInput.setAttribute("type", type);
-    this.classList.toggle("fa-eye-slash");
-  });
-}
-
-// ✅ Check if email exists before creating user
-async function checkEmailExists(email) {
-  try {
-    const methods = await fetchSignInMethodsForEmail(auth, email);
-    return methods.length > 0;
+    const userCredential = await signInWithPopup(auth, provider);
+    
+    // Create user record in database
+    await createUserInDatabase(userCredential.user);
+    
+    handleSignupSuccess(userCredential.user);
   } catch (error) {
-    console.error("Error checking email:", error);
-    return false;
+    handleSignupError(error);
+    setLoadingState(false);
   }
+};
+
+// Initialize Event Listeners
+const initializeSignup = () => {
+  if (signupForm) {
+    signupForm.addEventListener("submit", handleEmailSignup);
+  }
+  
+  if (googleBtn) {
+    googleBtn.addEventListener("click", handleGoogleSignup);
+  }
+  
+  // Add password visibility toggle if not already present
+  const passwordToggle = document.querySelector('.toggle-password');
+  if (passwordToggle && passwordInput) {
+    passwordToggle.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
+    });
+  }
+};
+
+// Initialize the signup functionality when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeSignup);
+} else {
+  initializeSignup();
 }
 
-// ✅ Signup form submit
-signupForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  if (!termsCheckbox.checked) {
-    showToast("Please agree to the Terms & Conditions.", "error");
-    return;
-  }
-  if (passwordInput.value !== confirmPasswordInput.value) {
-    showToast("Passwords do not match!", "error");
-    return;
-  }
-
-  signupBtn.classList.add("loading");
-  signupBtn.disabled = true;
-
-  try {
-    const emailExists = await checkEmailExists(emailInput.value);
-    if (emailExists) {
-      showToast("This email is already registered. Please login instead.", "error");
-      return;
-    }
-
-    const cred = await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    await updateProfile(cred.user, { displayName: fullnameInput.value });
-
-    const userRef = ref(db, "users/" + cred.user.uid);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      // ✅ Save all required fields with defaults
-      await set(userRef, {
-        uid: cred.user.uid,
-        name: fullnameInput.value,
-        email: emailInput.value,
-        college: "Not set",
-        course: "Not set",
-        year: "Not set",
-        block: "Not set",
-        roomNumber: "Not set",
-        createdAt: serverTimestamp(),
-      });
-    }
-
-    showToast("Account created successfully! Redirecting...", "success");
-    setTimeout(() => {
-      window.location.href = "college.html";
-    }, 2000);
-  } catch (error) {
-    if (error.code === "auth/email-already-in-use") {
-      showToast("This email is already registered. Please login instead.", "error");
-    } else {
-      showToast("Signup failed: " + error.message, "error");
-    }
-  } finally {
-    signupBtn.classList.remove("loading");
-    signupBtn.disabled = false;
-  }
-});
-
-// ✅ Google signup
-googleBtn.addEventListener("click", async () => {
-  signupBtn.classList.add("loading");
-  signupBtn.disabled = true;
-
-  try {
-    const provider = new GoogleAuthProvider();
-    const cred = await signInWithPopup(auth, provider);
-
-    const userRef = ref(db, "users/" + cred.user.uid);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      // ✅ Save all required fields with defaults
-      await set(userRef, {
-        uid: cred.user.uid,
-        name: cred.user.displayName,
-        email: cred.user.email,
-        photoURL: cred.user.photoURL,
-        college: "Not set",
-        course: "Not set",
-        year: "Not set",
-        block: "Not set",
-        roomNumber: "Not set",
-        createdAt: serverTimestamp(),
-      });
-    }
-
-    showToast("Google signup successful! Redirecting...", "success");
-    setTimeout(() => {
-      window.location.href = "college.html";
-    }, 2000);
-  } catch (err) {
-    showToast("Google signup failed: " + err.message, "error");
-  } finally {
-    signupBtn.classList.remove("loading");
-    signupBtn.disabled = false;
-  }
-});
+// Export functions for testing purposes (optional)
+export {
+  validateForm,
+  checkEmailExists,
+  createUserInDatabase,
+  handleSignupError
+};
