@@ -1,4 +1,4 @@
-// settings.js - Complete Firebase Integration
+// settings.js - Complete Firebase Integration with Google Account Handling
 import { auth, db } from "./firebase-config.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { 
@@ -20,6 +20,7 @@ const toast = document.getElementById("toast");
 let currentUser = null;
 let newProfilePicFile = null;
 let userData = null;
+let isGoogleUser = false;
 
 // Toast notification system
 function showToast(message, type = "success") {
@@ -28,6 +29,67 @@ function showToast(message, type = "success") {
   setTimeout(() => { 
     toast.className = toast.className.replace("show", ""); 
   }, 3000);
+}
+
+// Check if user is authenticated with Google
+function checkGoogleAuth(user) {
+  // Check if user has any Google-linked provider data
+  if (user.providerData && user.providerData.length > 0) {
+    return user.providerData.some(provider => provider.providerId === 'google.com');
+  }
+  return false;
+}
+
+// Handle UI for Google users (disable password fields and show message)
+function handleGoogleUserUI() {
+  if (isGoogleUser) {
+    // Add informational message at the top of password section
+    const passwordForm = document.getElementById('password-form');
+    const googleMessage = document.createElement('div');
+    googleMessage.className = 'google-info-message';
+    googleMessage.innerHTML = `
+      <div style="background-color: #e3f2fd; padding: 12px; border-radius: 8px; margin-bottom: 20px; 
+                  border-left: 4px solid #2196f3; display: flex; align-items: flex-start;">
+        <i class="fas fa-info-circle" style="color: #2196f3; font-size: 18px; margin-right: 10px; margin-top: 2px;"></i>
+        <div>
+          <p style="margin: 0; font-weight: 500; color: #0d47a1;">Google Account Detected</p>
+          <p style="margin: 5px 0 0 0; color: #546e7a; font-size: 14px;">
+            Your account is authenticated through Google. Password management is handled by Google. 
+            You can change your password through your Google account settings.
+          </p>
+        </div>
+      </div>
+    `;
+    passwordForm.insertBefore(googleMessage, passwordForm.firstChild);
+    
+    // Disable all password fields
+    const passwordFields = passwordForm.querySelectorAll('input[type="password"]');
+    passwordFields.forEach(field => {
+      field.disabled = true;
+      field.placeholder = "Not available for Google accounts";
+    });
+    
+    // Disable the submit button
+    const submitButton = document.getElementById('password-save-btn');
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Not available for Google accounts";
+      submitButton.style.opacity = "0.7";
+      submitButton.style.cursor = "not-allowed";
+    }
+    
+    // Add a helpful link to Google account management
+    const googleLink = document.createElement('div');
+    googleLink.style.marginTop = '15px';
+    googleLink.innerHTML = `
+      <a href="https://myaccount.google.com/security" target="_blank" 
+         style="display: inline-flex; align-items: center; color: #4361ee; text-decoration: none;">
+        <i class="fas fa-external-link-alt" style="margin-right: 5px;"></i>
+        Manage your Google account security settings
+      </a>
+    `;
+    passwordForm.appendChild(googleLink);
+  }
 }
 
 // Initialize settings page
@@ -95,6 +157,7 @@ function loadUserData() {
     }
     
     currentUser = user;
+    isGoogleUser = checkGoogleAuth(user);
     
     try {
       // Set up real-time listener for user data
@@ -103,6 +166,11 @@ function loadUserData() {
         if (snapshot.exists()) {
           userData = snapshot.val();
           populateUserData(user, userData);
+          
+          // Handle Google user UI after data is loaded
+          if (isGoogleUser) {
+            handleGoogleUserUI();
+          }
         } else {
           // Initialize user data if it doesn't exist
           initializeUserData(user);
@@ -212,16 +280,18 @@ async function handleProfileUpdate(e) {
     // Update profile in Firebase Auth
     await updateProfile(currentUser, { displayName: name, photoURL: photoURL });
     
-    // Update email if changed (with verification)
-    if (email !== currentUser.email) {
+    // Update email if changed (with verification) - only if not Google user
+    if (email !== currentUser.email && !isGoogleUser) {
       await verifyBeforeUpdateEmail(currentUser, email);
       showToast("Verification email sent. Please verify your new email address.");
+    } else if (email !== currentUser.email && isGoogleUser) {
+      showToast("Email changes for Google accounts must be made through Google", "error");
     }
 
     // Update user data in database
     await update(ref(db, "users/" + currentUser.uid), {
       name,
-      email,
+      email: isGoogleUser ? currentUser.email : email, // Keep original email for Google users
       phone,
       college,
       course,
@@ -255,6 +325,14 @@ async function handleProfileUpdate(e) {
 // Handle password update
 async function handlePasswordUpdate(e) {
   e.preventDefault();
+  
+  // Prevent password update for Google users
+  if (isGoogleUser) {
+    showToast("Password management for Google accounts is handled through Google", "info");
+    window.open("https://myaccount.google.com/security", "_blank");
+    return;
+  }
+  
   if (!currentUser) return;
   
   const saveBtn = document.getElementById("password-save-btn");
@@ -314,6 +392,13 @@ async function handlePasswordUpdate(e) {
 
 // Handle password reset
 async function handlePasswordReset() {
+  // Prevent password reset for Google users
+  if (isGoogleUser) {
+    showToast("Password management for Google accounts is handled through Google", "info");
+    window.open("https://myaccount.google.com/security", "_blank");
+    return;
+  }
+  
   if (!currentUser || !currentUser.email) {
     showToast("No email associated with this account", "error");
     return;
@@ -437,6 +522,39 @@ async function handleAccountDeletion() {
     return;
   }
   
+  // For Google users, we don't need password confirmation
+  if (isGoogleUser) {
+    if (!confirm("As a Google user, your authentication is handled by Google. Your account data will be deleted from our system, but you'll need to manage your Google account separately. Continue?")) {
+      return;
+    }
+    
+    try {
+      // Delete user's profile picture from storage if it exists
+      if (currentUser.photoURL && currentUser.photoURL.includes('profilePics')) {
+        try {
+          const fileRef = storageRef(storage, `profilePics/${currentUser.uid}`);
+          await deleteObject(fileRef);
+        } catch (storageError) {
+          console.warn("Could not delete profile picture:", storageError);
+        }
+      }
+      
+      // Delete user data from database
+      await remove(ref(db, "users/" + currentUser.uid));
+      
+      showToast("Account data deleted successfully. Signing out...");
+      setTimeout(() => {
+        handleLogout();
+      }, 2000);
+      return;
+    } catch (error) {
+      console.error("Error deleting Google user account:", error);
+      showToast("Error deleting account: " + error.message, "error");
+      return;
+    }
+  }
+  
+  // For email/password users, request password for confirmation
   const password = prompt("Please enter your password to confirm account deletion:");
   if (!password) return;
   
@@ -455,13 +573,10 @@ async function handleAccountDeletion() {
       }
     }
     
-    // Delete user's listings and other data (you would need to implement this based on your database structure)
-    // await deleteUserListings(currentUser.uid);
-    
     // Delete user data from database
     await remove(ref(db, "users/" + currentUser.uid));
     
-    // Delete user from authentication
+    // Delete user from authentication (only for non-Google users)
     await deleteUser(currentUser);
     
     showToast("Account deleted successfully");
