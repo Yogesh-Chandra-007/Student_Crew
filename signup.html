@@ -41,7 +41,7 @@
       margin-top: 5px;
     }
 
-    /* ✅ Toast styles (same as login) */
+    /* ✅ Toast styles */
     .toast-container {
       position: fixed;
       top: 20px;
@@ -71,8 +71,6 @@
     }
   </style>
 </head>
-  <script type="module" src="signup.js"></script>
-
 <body>
   <div class="gradient-bg"></div>
   <div class="auth-container">
@@ -86,12 +84,12 @@
         <p>Join the Student Crew and start connecting!</p>
       </div>
 
-      <form class="auth-form" id="signupForm">
+      <form class="auth-form" id="signup-form">
         <div class="form-group">
-          <label for="fullname">Full Name</label>
+          <label for="name">Full Name</label>
           <div class="input-with-icon">
             <i class="fas fa-user"></i>
-            <input type="text" id="fullname" placeholder="Enter your full name" required>
+            <input type="text" id="name" placeholder="Enter your full name" required>
           </div>
           <div class="error-message" id="fullnameError"></div>
         </div>
@@ -140,7 +138,7 @@
         </div>
 
         <div class="social-auth">
-          <button type="button" class="social-btn google">
+          <button type="button" id="googleSignupBtn" class="social-btn google">
             <i class="fab fa-google"></i> Google
           </button>
         </div>
@@ -155,6 +153,7 @@
   <!-- ✅ Toast container -->
   <div class="toast-container" id="toastContainer"></div>
 
+  <!-- JS -->
+  <script type="module" src="signup.js"></script>
 </body>
 </html>
-
