@@ -22,8 +22,6 @@ const inputPhone = document.getElementById("inputPhone");
 const inputCollege = document.getElementById("inputCollege"); // read-only
 const inputCourse = document.getElementById("inputCourse");
 const inputYear = document.getElementById("inputYear");
-const inputBlock = document.getElementById("inputBlock");
-const inputRoom = document.getElementById("inputRoom");
 
 let isEditMode = false;
 let currentUser = null;
@@ -60,8 +58,6 @@ function toggleEditMode() {
   inputPhone.readOnly = !isEditMode;
   inputCourse.readOnly = !isEditMode;
   inputYear.disabled = !isEditMode;
-  inputBlock.readOnly = !isEditMode;
-  inputRoom.readOnly = !isEditMode;
 
   // College always locked
   inputCollege.readOnly = true;
@@ -74,13 +70,12 @@ function saveProfile() {
   if (!user) { showToast("You must be logged in", "error"); spinner.style.display = "none"; return; }
 
   const updates = {
-    name: profileName.textContent,
+    fullName: profileName.textContent,
     email: inputEmail.value,
     phone: inputPhone.value,
-    // college: not editable
+    // college not editable
     course: inputCourse.value,
     year: inputYear.value,
-    hostel: { block: inputBlock.value, room: inputRoom.value },
     updatedAt: Date.now()
   };
 
@@ -110,7 +105,7 @@ function loadUserData() {
       const data = snapshot.val();
       console.log("Loaded user data:", data); // 👈 debug log
 
-      profileName.textContent = data.name || user.displayName || "Student";
+      profileName.textContent = data.fullName || user.displayName || "Student";
       profileCollege.textContent = data.college || "No college selected";
       coinsCount.textContent = data.coins || 0;
       friendsCount.textContent = data.friends ? Object.keys(data.friends).length : 0;
@@ -118,11 +113,9 @@ function loadUserData() {
 
       inputEmail.value = data.email || user.email || "";
       inputPhone.value = data.phone || "";
-      inputCollege.value = data.college || "VVIT, Guntur";
-      inputCourse.value = data.course || "";
+      inputCollege.value = data.college || "VVIT";
+      inputCourse.value = data.course?.trim() || "";
       inputYear.value = data.year || "1";
-      inputBlock.value = data.hostel?.block || "";
-      inputRoom.value = data.hostel?.room || "";
 
       if (data.photoURL) { profileAvatar.src = navProfileImg.src = data.photoURL; }
       else if (user.photoURL) { profileAvatar.src = navProfileImg.src = user.photoURL; }
