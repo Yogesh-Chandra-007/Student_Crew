@@ -13,29 +13,22 @@ const profileCollege = document.getElementById("profileCollege");
 const coinsCount = document.getElementById("coinsCount");
 const friendsCount = document.getElementById("friendsCount");
 const listingsCount = document.getElementById("listingsCount");
-const infoEmail = document.getElementById("infoEmail");
-const infoPhone = document.getElementById("infoPhone");
-const infoCollege = document.getElementById("infoCollege");
-const infoCourse = document.getElementById("infoCourse");
-const infoYear = document.getElementById("infoYear");
-const infoHostel = document.getElementById("infoHostel");
 const editProfileBtn = document.getElementById("editProfileBtn");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 
 // Input elements
 const inputEmail = document.getElementById("inputEmail");
 const inputPhone = document.getElementById("inputPhone");
-const inputCollege = document.getElementById("inputCollege");
+const inputCollege = document.getElementById("inputCollege"); // read-only
 const inputCourse = document.getElementById("inputCourse");
 const inputYear = document.getElementById("inputYear");
 const inputBlock = document.getElementById("inputBlock");
 const inputRoom = document.getElementById("inputRoom");
-const hostelInputs = document.querySelector(".hostel-inputs");
 
 let isEditMode = false;
 let currentUser = null;
 
-// Show toast function
+// Show toast
 function showToast(message, type = "success") {
   toast.textContent = message;
   toast.className = "toast " + type + " show";
@@ -56,35 +49,11 @@ function logout() {
   .catch((error) => showToast("Error signing out", "error"));
 }
 
-// Toggle edit mode
+// Toggle edit mode (only buttons change)
 function toggleEditMode() {
   isEditMode = !isEditMode;
-  const infoItems = document.querySelectorAll('.info-item');
-  
-  infoItems.forEach(item => item.classList.toggle('edit-mode', isEditMode));
-  hostelInputs.style.display = isEditMode ? 'block' : 'none';
-  editProfileBtn.style.display = isEditMode ? 'none' : 'flex';
-  saveProfileBtn.style.display = isEditMode ? 'flex' : 'none';
-  
-  if (!isEditMode) updateViewFromInputs();
-}
-
-// Update view from inputs
-function updateViewFromInputs() {
-  infoEmail.textContent = inputEmail.value;
-  infoPhone.textContent = inputPhone.value;
-  infoCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
-  infoCourse.textContent = inputCourse.value;
-  
-  const yearText = inputYear.value === "1" ? "1st Year" :
-                   inputYear.value === "2" ? "2nd Year" :
-                   inputYear.value === "3" ? "3rd Year" : "4th Year";
-  infoYear.textContent = yearText;
-  
-  const blockText = inputBlock.value || "";
-  const roomText = inputRoom.value ? `Room ${inputRoom.value}` : "";
-  const separator = (blockText && roomText) ? ", " : "";
-  infoHostel.textContent = blockText + separator + roomText || "Not provided";
+  editProfileBtn.style.display = isEditMode ? "none" : "flex";
+  saveProfileBtn.style.display = isEditMode ? "flex" : "none";
 }
 
 // Save profile
@@ -97,7 +66,7 @@ function saveProfile() {
     name: profileName.textContent,
     email: inputEmail.value,
     phone: inputPhone.value,
-    college: inputCollege.value,
+    // college: not editable
     course: inputCourse.value,
     year: inputYear.value,
     hostel: { block: inputBlock.value, room: inputRoom.value },
@@ -108,8 +77,7 @@ function saveProfile() {
     .then(() => {
       spinner.style.display = "none";
       showToast("Profile updated successfully!");
-      updateViewFromInputs();
-      profileCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
+      profileCollege.textContent = inputCollege.value; // stays same
       isEditMode = false;
       toggleEditMode();
     })
@@ -135,30 +103,9 @@ function loadUserData() {
       friendsCount.textContent = data.friends ? Object.keys(data.friends).length : 0;
       listingsCount.textContent = data.listings ? Object.keys(data.listings).length : 0;
 
-      infoEmail.textContent = data.email || user.email || "Not provided";
-      infoPhone.textContent = data.phone || "Not provided";
-      infoCollege.textContent = data.college || "Not selected";
-      infoCourse.textContent = data.course || "Not provided";
-
-      const yearText = data.year === "1" ? "1st Year" :
-                       data.year === "2" ? "2nd Year" :
-                       data.year === "3" ? "3rd Year" :
-                       data.year === "4" ? "4th Year" : "Not provided";
-      infoYear.textContent = yearText;
-
-      if (data.hostel) {
-        const blockText = data.hostel.block || "";
-        const roomText = data.hostel.room ? `Room ${data.hostel.room}` : "";
-        const sep = (blockText && roomText) ? ", " : "";
-        infoHostel.textContent = blockText + sep + roomText || "Not provided";
-      } else {
-        infoHostel.textContent = "Not provided";
-      }
-
-      // Set input values
       inputEmail.value = data.email || user.email || "";
       inputPhone.value = data.phone || "";
-      inputCollege.value = data.college || "VVIT";
+      inputCollege.value = data.college || "VVIT, Guntur"; // read-only
       inputCourse.value = data.course || "";
       inputYear.value = data.year || "1";
       inputBlock.value = data.hostel?.block || "";
@@ -194,7 +141,7 @@ onAuthStateChanged(auth, (user) => {
   else { window.location.href = "login.html"; }
 });
 
-// Make functions globally accessible
+// Make functions global
 window.toggleProfileMenu = toggleProfileMenu;
 window.logout = logout;
 window.toggleEditMode = toggleEditMode;
