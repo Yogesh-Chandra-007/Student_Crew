@@ -49,11 +49,22 @@ function logout() {
   .catch((error) => showToast("Error signing out", "error"));
 }
 
-// Toggle edit mode (only buttons change)
+// Toggle edit mode
 function toggleEditMode() {
   isEditMode = !isEditMode;
+
   editProfileBtn.style.display = isEditMode ? "none" : "flex";
   saveProfileBtn.style.display = isEditMode ? "flex" : "none";
+
+  inputEmail.readOnly = !isEditMode;
+  inputPhone.readOnly = !isEditMode;
+  inputCourse.readOnly = !isEditMode;
+  inputYear.disabled = !isEditMode;
+  inputBlock.readOnly = !isEditMode;
+  inputRoom.readOnly = !isEditMode;
+
+  // College always locked
+  inputCollege.readOnly = true;
 }
 
 // Save profile
@@ -73,11 +84,11 @@ function saveProfile() {
     updatedAt: Date.now()
   };
 
-  update(ref(db, 'users/' + user.uid), updates)
+  update(ref(db, "users/" + user.uid), updates)
     .then(() => {
       spinner.style.display = "none";
       showToast("Profile updated successfully!");
-      profileCollege.textContent = inputCollege.value; // stays same
+      profileCollege.textContent = inputCollege.value; // show locked college
       isEditMode = false;
       toggleEditMode();
     })
@@ -97,6 +108,8 @@ function loadUserData() {
     spinner.style.display = "none";
     if (snapshot.exists()) {
       const data = snapshot.val();
+      console.log("Loaded user data:", data); // 👈 debug log
+
       profileName.textContent = data.name || user.displayName || "Student";
       profileCollege.textContent = data.college || "No college selected";
       coinsCount.textContent = data.coins || 0;
@@ -105,7 +118,7 @@ function loadUserData() {
 
       inputEmail.value = data.email || user.email || "";
       inputPhone.value = data.phone || "";
-      inputCollege.value = data.college || "VVIT, Guntur"; // read-only
+      inputCollege.value = data.college || "VVIT, Guntur";
       inputCourse.value = data.course || "";
       inputYear.value = data.year || "1";
       inputBlock.value = data.hostel?.block || "";
@@ -123,14 +136,14 @@ function loadUserData() {
 }
 
 // Avatar preview
-document.getElementById('avatar-upload').addEventListener('change', function(e) {
+document.getElementById("avatar-upload").addEventListener("change", function(e) {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = (event) => {
       profileAvatar.src = navProfileImg.src = event.target.result;
       showToast("Profile picture updated", "success");
-    }
+    };
     reader.readAsDataURL(file);
   }
 });
