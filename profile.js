@@ -13,20 +13,25 @@ const profileCollege = document.getElementById("profileCollege");
 const coinsCount = document.getElementById("coinsCount");
 const friendsCount = document.getElementById("friendsCount");
 const listingsCount = document.getElementById("listingsCount");
+const infoEmail = document.getElementById("infoEmail");
+const infoPhone = document.getElementById("infoPhone");
+const infoCollege = document.getElementById("infoCollege");
+const infoCourse = document.getElementById("infoCourse");
+const infoYear = document.getElementById("infoYear");
 const editProfileBtn = document.getElementById("editProfileBtn");
 const saveProfileBtn = document.getElementById("saveProfileBtn");
 
 // Input elements
 const inputEmail = document.getElementById("inputEmail");
 const inputPhone = document.getElementById("inputPhone");
-const inputCollege = document.getElementById("inputCollege"); // read-only
+const inputCollege = document.getElementById("inputCollege");
 const inputCourse = document.getElementById("inputCourse");
 const inputYear = document.getElementById("inputYear");
 
 let isEditMode = false;
 let currentUser = null;
 
-// Show toast
+// Show toast function
 function showToast(message, type = "success") {
   toast.textContent = message;
   toast.className = "toast " + type + " show";
@@ -50,17 +55,26 @@ function logout() {
 // Toggle edit mode
 function toggleEditMode() {
   isEditMode = !isEditMode;
+  const infoItems = document.querySelectorAll('.info-item');
+  
+  infoItems.forEach(item => item.classList.toggle('edit-mode', isEditMode));
+  editProfileBtn.style.display = isEditMode ? 'none' : 'flex';
+  saveProfileBtn.style.display = isEditMode ? 'flex' : 'none';
+  
+  if (!isEditMode) updateViewFromInputs();
+}
 
-  editProfileBtn.style.display = isEditMode ? "none" : "flex";
-  saveProfileBtn.style.display = isEditMode ? "flex" : "none";
-
-  inputEmail.readOnly = !isEditMode;
-  inputPhone.readOnly = !isEditMode;
-  inputCourse.readOnly = !isEditMode;
-  inputYear.disabled = !isEditMode;
-
-  // College always locked
-  inputCollege.readOnly = true;
+// Update view from inputs
+function updateViewFromInputs() {
+  infoEmail.textContent = inputEmail.value;
+  infoPhone.textContent = inputPhone.value;
+  infoCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
+  infoCourse.textContent = inputCourse.value;
+  
+  const yearText = inputYear.value === "1" ? "1st Year" :
+                   inputYear.value === "2" ? "2nd Year" :
+                   inputYear.value === "3" ? "3rd Year" : "4th Year";
+  infoYear.textContent = yearText;
 }
 
 // Save profile
@@ -70,20 +84,21 @@ function saveProfile() {
   if (!user) { showToast("You must be logged in", "error"); spinner.style.display = "none"; return; }
 
   const updates = {
-    fullName: profileName.textContent,
+    name: profileName.textContent,
     email: inputEmail.value,
     phone: inputPhone.value,
-    // college not editable
+    college: inputCollege.value,
     course: inputCourse.value,
     year: inputYear.value,
     updatedAt: Date.now()
   };
 
-  update(ref(db, "users/" + user.uid), updates)
+  update(ref(db, 'users/' + user.uid), updates)
     .then(() => {
       spinner.style.display = "none";
       showToast("Profile updated successfully!");
-      profileCollege.textContent = inputCollege.value; // show locked college
+      updateViewFromInputs();
+      profileCollege.textContent = inputCollege.options[inputCollege.selectedIndex].text;
       isEditMode = false;
       toggleEditMode();
     })
@@ -103,18 +118,28 @@ function loadUserData() {
     spinner.style.display = "none";
     if (snapshot.exists()) {
       const data = snapshot.val();
-      console.log("Loaded user data:", data); // 👈 debug log
-
-      profileName.textContent = data.fullName || user.displayName || "Student";
+      profileName.textContent = data.name || user.displayName || "Student";
       profileCollege.textContent = data.college || "No college selected";
       coinsCount.textContent = data.coins || 0;
       friendsCount.textContent = data.friends ? Object.keys(data.friends).length : 0;
       listingsCount.textContent = data.listings ? Object.keys(data.listings).length : 0;
 
+      infoEmail.textContent = data.email || user.email || "Not provided";
+      infoPhone.textContent = data.phone || "Not provided";
+      infoCollege.textContent = data.college || "Not selected";
+      infoCourse.textContent = data.course || "Not provided";
+
+      const yearText = data.year === "1" ? "1st Year" :
+                       data.year === "2" ? "2nd Year" :
+                       data.year === "3" ? "3rd Year" :
+                       data.year === "4" ? "4th Year" : "Not provided";
+      infoYear.textContent = yearText;
+
+      // Set input values
       inputEmail.value = data.email || user.email || "";
       inputPhone.value = data.phone || "";
       inputCollege.value = data.college || "VVIT";
-      inputCourse.value = data.course?.trim() || "";
+      inputCourse.value = data.course || "";
       inputYear.value = data.year || "1";
 
       if (data.photoURL) { profileAvatar.src = navProfileImg.src = data.photoURL; }
@@ -129,14 +154,14 @@ function loadUserData() {
 }
 
 // Avatar preview
-document.getElementById("avatar-upload").addEventListener("change", function(e) {
+document.getElementById('avatar-upload').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = (event) => {
       profileAvatar.src = navProfileImg.src = event.target.result;
       showToast("Profile picture updated", "success");
-    };
+    }
     reader.readAsDataURL(file);
   }
 });
@@ -147,7 +172,7 @@ onAuthStateChanged(auth, (user) => {
   else { window.location.href = "login.html"; }
 });
 
-// Make functions global
+// Make functions globally accessible
 window.toggleProfileMenu = toggleProfileMenu;
 window.logout = logout;
 window.toggleEditMode = toggleEditMode;
