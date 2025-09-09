@@ -19,7 +19,7 @@ const saveProfileBtn = document.getElementById("saveProfileBtn");
 // Input elements
 const inputEmail = document.getElementById("inputEmail");
 const inputPhone = document.getElementById("inputPhone");
-const inputCollege = document.getElementById("inputCollege"); // locked
+const inputCollege = document.getElementById("inputCollege"); // read-only
 const inputCourse = document.getElementById("inputCourse");
 const inputYear = document.getElementById("inputYear");
 const inputBlock = document.getElementById("inputBlock");
@@ -49,24 +49,11 @@ function logout() {
   .catch((error) => showToast("Error signing out", "error"));
 }
 
-// Toggle edit mode
+// Toggle edit mode (only buttons change)
 function toggleEditMode() {
   isEditMode = !isEditMode;
-
-  // Toggle buttons
   editProfileBtn.style.display = isEditMode ? "none" : "flex";
   saveProfileBtn.style.display = isEditMode ? "flex" : "none";
-
-  // Toggle input states
-  inputEmail.readOnly = !isEditMode;
-  inputPhone.readOnly = !isEditMode;
-  inputCourse.readOnly = !isEditMode;
-  inputYear.disabled = !isEditMode;
-  inputBlock.readOnly = !isEditMode;
-  inputRoom.readOnly = !isEditMode;
-
-  // College always locked
-  inputCollege.disabled = true;
 }
 
 // Save profile
@@ -79,7 +66,7 @@ function saveProfile() {
     name: profileName.textContent,
     email: inputEmail.value,
     phone: inputPhone.value,
-    // college is not editable
+    // college: not editable
     course: inputCourse.value,
     year: inputYear.value,
     hostel: { block: inputBlock.value, room: inputRoom.value },
@@ -90,7 +77,7 @@ function saveProfile() {
     .then(() => {
       spinner.style.display = "none";
       showToast("Profile updated successfully!");
-      profileCollege.textContent = inputCollege.value; // display only, never updated
+      profileCollege.textContent = inputCollege.value; // stays same
       isEditMode = false;
       toggleEditMode();
     })
@@ -118,7 +105,7 @@ function loadUserData() {
 
       inputEmail.value = data.email || user.email || "";
       inputPhone.value = data.phone || "";
-      inputCollege.value = data.college || "VVIT, Guntur"; // locked
+      inputCollege.value = data.college || "VVIT, Guntur"; // read-only
       inputCourse.value = data.course || "";
       inputYear.value = data.year || "1";
       inputBlock.value = data.hostel?.block || "";
