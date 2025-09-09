@@ -66,7 +66,7 @@ function saveProfile() {
     name: profileName.textContent,
     email: inputEmail.value,
     phone: inputPhone.value,
-    // college: not editable
+    // college is not editable
     course: inputCourse.value,
     year: inputYear.value,
     hostel: { block: inputBlock.value, room: inputRoom.value },
@@ -77,7 +77,7 @@ function saveProfile() {
     .then(() => {
       spinner.style.display = "none";
       showToast("Profile updated successfully!");
-      profileCollege.textContent = inputCollege.value; // stays same
+      profileCollege.textContent = inputCollege.value; // still shown but never updated
       isEditMode = false;
       toggleEditMode();
     })
