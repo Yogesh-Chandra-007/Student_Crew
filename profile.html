@@ -55,15 +55,15 @@
         <p class="college" id="profileCollege">VVIT College, Guntur</p>
         <div class="profile-stats">
           <div class="stat">
-            <span class="number" id="coinsCount">0</span>
+            <span class="number" id="coinsCount">120</span>
             <span class="label">Coins</span>
           </div>
           <div class="stat">
-            <span class="number" id="friendsCount">0</span>
+            <span class="number" id="friendsCount">18</span>
             <span class="label">Friends</span>
           </div>
           <div class="stat">
-            <span class="number" id="listingsCount">0</span>
+            <span class="number" id="listingsCount">8</span>
             <span class="label">Listings</span>
           </div>
         </div>
@@ -76,28 +76,48 @@
         <div class="info-grid">
           <div class="info-item">
             <span class="label">Email</span>
-            <input type="email" id="inputEmail" readonly>
+            <span class="value" id="infoEmail">john.doe@example.com</span>
+            <input type="email" id="inputEmail" class="view-mode" value="john.doe@example.com">
           </div>
           <div class="info-item">
             <span class="label">Phone Number</span>
-            <input type="tel" id="inputPhone" readonly>
+            <span class="value" id="infoPhone">+91 9876543210</span>
+            <input type="tel" id="inputPhone" class="view-mode" value="+91 9876543210">
           </div>
           <div class="info-item">
             <span class="label">College</span>
-            <input type="text" id="inputCollege" readonly>
+            <span class="value" id="infoCollege">VVIT, Guntur</span>
+            <select id="inputCollege" class="view-mode">
+              <option value="VVIT">VVIT, Guntur</option>
+              <option value="AUCE">AUCE, Visakhapatnam</option>
+              <option value="GITAM">GITAM, Visakhapatnam</option>
+              <option value="NIT-T">NIT, Tadepalligudem</option>
+            </select>
           </div>
           <div class="info-item">
             <span class="label">Course</span>
-            <input type="text" id="inputCourse" readonly>
+            <span class="value" id="infoCourse">B.Tech Computer Science</span>
+            <input type="text" id="inputCourse" class="view-mode" value="B.Tech Computer Science">
           </div>
           <div class="info-item">
             <span class="label">Year</span>
-            <select id="inputYear" disabled>
+            <span class="value" id="infoYear">3rd Year</span>
+            <select id="inputYear" class="view-mode">
               <option value="1">1st Year</option>
               <option value="2">2nd Year</option>
-              <option value="3">3rd Year</option>
+              <option value="3" selected>3rd Year</option>
               <option value="4">4th Year</option>
             </select>
+          </div>
+          <div class="info-item">
+            <span class="label">Room Number</span>
+            <span class="value" id="infoRoom">C-Block, Room 204</span>
+            <div class="RoomNumber-inputs view-mode hostel-inputs" style="display: none;">
+              <div style="display: flex; gap: 10px;">
+                <input type="text" id="inputBlock" placeholder="Block" value="C-Block" style="flex: 1;">
+                <input type="text" id="inputRoom" placeholder="Room" value="204" style="flex: 1;">
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -107,7 +127,7 @@
       <button class="btn-primary" id="editProfileBtn" onclick="toggleEditMode()">
         <i class="fas fa-user-edit"></i> Edit Profile
       </button>
-      <button class="btn-success" id="saveProfileBtn" onclick="saveProfile()" style="display: none;">
+      <button class="btn-success" id="saveProfileBtn" onclick="saveProfile()">
         <i class="fas fa-save"></i> Save Changes
       </button>
       <button class="btn-secondary" onclick="window.history.back()">
