@@ -76,33 +76,24 @@
         <div class="info-grid">
           <div class="info-item">
             <span class="label">Email</span>
-            <span class="value" id="infoEmail">john.doe@example.com</span>
-            <input type="email" id="inputEmail" class="view-mode" value="john.doe@example.com">
+            <input type="email" id="inputEmail" value="john.doe@example.com">
           </div>
           <div class="info-item">
             <span class="label">Phone Number</span>
-            <span class="value" id="infoPhone">+91 9876543210</span>
-            <input type="tel" id="inputPhone" class="view-mode" value="+91 9876543210">
+            <input type="tel" id="inputPhone" value="+91 9876543210">
           </div>
           <div class="info-item">
             <span class="label">College</span>
-            <span class="value" id="infoCollege">VVIT, Guntur</span>
-            <select id="inputCollege" class="view-mode">
-              <option value="VVIT">VVIT, Guntur</option>
-              <option value="AUCE">AUCE, Visakhapatnam</option>
-              <option value="GITAM">GITAM, Visakhapatnam</option>
-              <option value="NIT-T">NIT, Tadepalligudem</option>
-            </select>
+            <!-- Read-only College -->
+            <input type="text" id="inputCollege" value="VVIT, Guntur" disabled>
           </div>
           <div class="info-item">
             <span class="label">Course</span>
-            <span class="value" id="infoCourse">B.Tech Computer Science</span>
-            <input type="text" id="inputCourse" class="view-mode" value="B.Tech Computer Science">
+            <input type="text" id="inputCourse" value="B.Tech Computer Science">
           </div>
           <div class="info-item">
             <span class="label">Year</span>
-            <span class="value" id="infoYear">3rd Year</span>
-            <select id="inputYear" class="view-mode">
+            <select id="inputYear">
               <option value="1">1st Year</option>
               <option value="2">2nd Year</option>
               <option value="3" selected>3rd Year</option>
@@ -111,8 +102,7 @@
           </div>
           <div class="info-item">
             <span class="label">Room Number</span>
-            <span class="value" id="infoHostel">C-Block, Room 204</span>
-            <div class="RoomNumber-inputs view-mode hostel-inputs" style="display: none;">
+            <div class="RoomNumber-inputs hostel-inputs">
               <div style="display: flex; gap: 10px;">
                 <input type="text" id="inputBlock" placeholder="Block" value="C-Block" style="flex: 1;">
                 <input type="text" id="inputRoom" placeholder="Room" value="204" style="flex: 1;">
