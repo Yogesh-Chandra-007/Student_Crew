@@ -55,15 +55,15 @@
         <p class="college" id="profileCollege">VVIT College, Guntur</p>
         <div class="profile-stats">
           <div class="stat">
-            <span class="number" id="coinsCount">120</span>
+            <span class="number" id="coinsCount">0</span>
             <span class="label">Coins</span>
           </div>
           <div class="stat">
-            <span class="number" id="friendsCount">18</span>
+            <span class="number" id="friendsCount">0</span>
             <span class="label">Friends</span>
           </div>
           <div class="stat">
-            <span class="number" id="listingsCount">8</span>
+            <span class="number" id="listingsCount">0</span>
             <span class="label">Listings</span>
           </div>
         </div>
@@ -76,40 +76,36 @@
         <div class="info-grid">
           <div class="info-item">
             <span class="label">Email</span>
-            <input type="email" id="inputEmail" value="john.doe@example.com">
+            <input type="email" id="inputEmail" readonly>
           </div>
           <div class="info-item">
             <span class="label">Phone Number</span>
-            <input type="tel" id="inputPhone" value="+91 9876543210">
+            <input type="tel" id="inputPhone" readonly>
           </div>
           <div class="info-item">
             <span class="label">College</span>
-            <!-- Read-only College -->
-            <input type="text" id="inputCollege" value="VVIT, Guntur" disabled>
+            <input type="text" id="inputCollege" readonly>
           </div>
           <div class="info-item">
             <span class="label">Course</span>
-            <input type="text" id="inputCourse" value="B.Tech Computer Science">
+            <input type="text" id="inputCourse" readonly>
           </div>
           <div class="info-item">
             <span class="label">Year</span>
-            <select id="inputYear">
+            <select id="inputYear" disabled>
               <option value="1">1st Year</option>
               <option value="2">2nd Year</option>
-              <option value="3" selected>3rd Year</option>
+              <option value="3">3rd Year</option>
               <option value="4">4th Year</option>
             </select>
           </div>
           <div class="info-item">
-  <span class="label">Room Number</span>
-  <div class="RoomNumber-inputs hostel-inputs">
-    <div style="display: flex; gap: 10px;">
-      <input type="text" id="inputBlock" placeholder="Block" value="C-Block" style="flex: 1;">
-      <input type="text" id="inputRoom" placeholder="Room" value="204" style="flex: 1;">
-    </div>
-  </div>
-</div>
-
+            <span class="label">Room Number</span>
+            <div style="display: flex; gap: 10px;">
+              <input type="text" id="inputBlock" placeholder="Block" readonly style="flex: 1;">
+              <input type="text" id="inputRoom" placeholder="Room" readonly style="flex: 1;">
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -118,7 +114,7 @@
       <button class="btn-primary" id="editProfileBtn" onclick="toggleEditMode()">
         <i class="fas fa-user-edit"></i> Edit Profile
       </button>
-      <button class="btn-success" id="saveProfileBtn" onclick="saveProfile()">
+      <button class="btn-success" id="saveProfileBtn" onclick="saveProfile()" style="display: none;">
         <i class="fas fa-save"></i> Save Changes
       </button>
       <button class="btn-secondary" onclick="window.history.back()">
