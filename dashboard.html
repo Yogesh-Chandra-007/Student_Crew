@@ -24,20 +24,20 @@
       <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
     </div>
     <div class="nav-profile" onclick="toggleProfileMenu()">
-      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" id="navProfileImg">
       <!-- Update this in all HTML files (dashboard.html, terms.html, report.html) -->
-<!-- Update this in dashboard.html -->
-<div class="profile-menu" id="profileMenu">
-  <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
-  <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
-  <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
-  <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
-  <div class="divider"></div>
-  <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
-  <a href="report.html"><i class="fas fa-bug"></i> Report Issue</a>
-  <div class="divider"></div>
-  <a href="#" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-</div>
+      <!-- Update this in dashboard.html -->
+      <div class="profile-menu" id="profileMenu">
+        <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+        <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
+        <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
+        <div class="divider"></div>
+        <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+        <a href="report.html"><i class="fas fa-bug"></i> Report Issue</a>
+        <div class="divider"></div>
+        <a href="#" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
     </div>
   </nav>
 
@@ -45,7 +45,7 @@
     <!-- Welcome Section -->
     <section class="welcome-section">
       <div class="welcome-content">
-        <h1>Welcome back, <span>John</span>!</h1>
+        <h1>Welcome back, <span id="userName">User</span>!</h1>
         <p>What would you like to do today?</p>
       </div>
       <div class="stats-card">
@@ -54,7 +54,7 @@
             <i class="fas fa-coins"></i>
           </div>
           <div class="stat-info">
-            <h3>120</h3>
+            <h3 id="coinsCount">120</h3>
             <p>Coins</p>
           </div>
         </div>
@@ -63,7 +63,7 @@
             <i class="fas fa-box-open"></i>
           </div>
           <div class="stat-info">
-            <h3>8</h3>
+            <h3 id="listingsCount">8</h3>
             <p>Listings</p>
           </div>
         </div>
@@ -72,7 +72,7 @@
             <i class="fas fa-user-friends"></i>
           </div>
           <div class="stat-info">
-            <h3>15</h3>
+            <h3 id="friendsCount">15</h3>
             <p>Friends</p>
           </div>
         </div>
@@ -153,7 +153,14 @@
     </section>
   </main>
 
-  <script>
+  <!-- Add Firebase SDKs -->
+  <script type="module">
+    // Import Firebase modules
+    import { auth, db } from "./firebase-config.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    
+    // Function to toggle profile menu
     function toggleProfileMenu() {
       const menu = document.getElementById("profileMenu");
       menu.classList.toggle("active");
@@ -165,6 +172,56 @@
       const profileBtn = document.querySelector('.nav-profile');
       if (!profileBtn.contains(event.target) && !profileMenu.contains(event.target)) {
         profileMenu.classList.remove('active');
+      }
+    });
+
+    // Logout function
+    function logout() {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      }).catch((error) => {
+        console.error("Error signing out:", error);
+      });
+    }
+
+    // Load user data
+    function loadUserData(user) {
+      // Get user data from Realtime Database
+      get(ref(db, 'users/' + user.uid)).then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          
+          // Update welcome message with user's name
+          const userNameElement = document.getElementById('userName');
+          userNameElement.textContent = userData.name || user.displayName || 'User';
+          
+          // Update stats
+          document.getElementById('coinsCount').textContent = userData.coins || 0;
+          document.getElementById('listingsCount').textContent = userData.listings ? Object.keys(userData.listings).length : 0;
+          document.getElementById('friendsCount').textContent = userData.friends ? Object.keys(userData.friends).length : 0;
+          
+          // Update profile image if available
+          if (userData.photoURL) {
+            document.getElementById('navProfileImg').src = userData.photoURL;
+          } else if (user.photoURL) {
+            document.getElementById('navProfileImg').src = user.photoURL;
+          }
+        } else {
+          console.log("No user data available");
+        }
+      }).catch((error) => {
+        console.error("Error getting user data:", error);
+      });
+    }
+
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        loadUserData(user);
+      } else {
+        // User is signed out, redirect to login
+        window.location.href = "login.html";
       }
     });
 
@@ -203,15 +260,13 @@
 
       setTimeout(typePlaceholder, typingSpeed);
     }
-    // Add this function to your dashboard.html script
-function logout() {
-  // You'll need to implement Firebase logout here
-  // For now, just redirect to login page
-  window.location.href = "login.html";
-}
 
     // Start the animation
     setTimeout(typePlaceholder, 1000);
+    
+    // Make functions globally accessible
+    window.toggleProfileMenu = toggleProfileMenu;
+    window.logout = logout;
   </script>
 </body>
 </html>
