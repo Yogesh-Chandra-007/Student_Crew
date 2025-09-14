@@ -177,3 +177,33 @@ window.toggleProfileMenu = toggleProfileMenu;
 window.logout = logout;
 window.toggleEditMode = toggleEditMode;
 window.saveProfile = saveProfile;
+
+// In profile.js, modify the avatar upload event listener
+document.getElementById('avatar-upload').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            // Update both profile and navigation images
+            profileAvatar.src = event.target.result;
+            
+            // Update navigation profile image across all pages
+            const navProfileImg = document.getElementById("navProfileImg");
+            if (navProfileImg) {
+                navProfileImg.src = event.target.result;
+            }
+            
+            showToast("Profile picture updated", "success");
+            
+            // Save to Firebase if user is logged in
+            const user = auth.currentUser;
+            if (user) {
+                update(ref(db, 'users/' + user.uid), {
+                    photoURL: event.target.result,
+                    updatedAt: Date.now()
+                });
+            }
+        }
+        reader.readAsDataURL(file);
+    }
+});
