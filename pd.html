@@ -142,5 +142,29 @@
       });
     });
   </script>
+  <script type="module">
+    import { initializeNavigation } from "./navigation.js";
+    import { initializeProductDetails } from "./pd.js";
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    
+    // Initialize navigation with user data
+    initializeNavigation();
+    
+    // Initialize product details functionality
+    initializeProductDetails();
+    
+    // Logout function
+    function logout() {
+        signOut(auth).then(() => {
+            window.location.href = "login.html";
+        }).catch((error) => {
+            console.error("Error signing out:", error);
+        });
+    }
+    
+    // Make functions globally accessible
+    window.logout = logout;
+</script>
 </body>
 </html>
