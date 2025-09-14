@@ -24,16 +24,20 @@
       <a href="inbox.html"><i class="fas fa-inbox"></i> Inbox</a>
     </div>
     <div class="nav-profile" onclick="toggleProfileMenu()">
-      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" id="navProfileImg">
+      <!-- Update this in all HTML files (dashboard.html, terms.html, report.html) -->
+      <!-- Update this in dashboard.html -->
       <div class="profile-menu" id="profileMenu">
         <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
         <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
         <a href="coins.html"><i class="fas fa-coins"></i> Coins</a>
         <a href="friends.html"><i class="fas fa-user-friends"></i> Friends</a>
         <div class="divider"></div>
-        <a href="login.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i> Terms</a>
+        <a href="report.html"><i class="fas fa-bug"></i> Report Issue</a>
+        <div class="divider"></div>
+        <a href="#" class="logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </div>
-    </div>
   </nav>
 
   <main class="listings-container">
@@ -274,4 +278,5 @@
   </script>
 </body>
 </html>
+
 
