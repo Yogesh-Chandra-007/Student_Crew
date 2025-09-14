@@ -219,7 +219,53 @@
       }
     });
   </script>
+  <script type="module">
+    import { initializeNavigation } from "./navigation.js";
+    import { initializeInbox, sendChatMessage } from "./inbox.js";
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    
+    // Initialize navigation with user data
+    initializeNavigation();
+    
+    // Initialize inbox functionality
+    initializeInbox();
+    
+    // Logout function
+    function logout() {
+        signOut(auth).then(() => {
+            window.location.href = "login.html";
+        }).catch((error) => {
+            console.error("Error signing out:", error);
+        });
+    }
+    
+    // Make functions globally accessible
+    window.logout = logout;
+    window.sendChatMessage = sendChatMessage;
+    
+    // Handle URL parameters for opening specific chat
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatId = urlParams.get('chat');
+    if (chatId) {
+        setTimeout(() => openChat(chatId), 1000);
+    }
+    
+    // Send message on Enter key
+    document.querySelector('.message-input input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendChatMessage();
+        }
+    });
+    
+    // New chat button functionality
+    document.querySelector('.new-chat').addEventListener('click', function() {
+        // This would typically open a modal to select a product/user to chat with
+        alert('Feature coming soon! For now, use "Chat with Seller" on product pages.');
+    });
+</script>
 </body>
 </html>
+
 
 
