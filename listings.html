@@ -25,8 +25,6 @@
     </div>
     <div class="nav-profile" onclick="toggleProfileMenu()">
       <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" id="navProfileImg">
-      <!-- Update this in all HTML files (dashboard.html, terms.html, report.html) -->
-      <!-- Update this in dashboard.html -->
       <div class="profile-menu" id="profileMenu">
         <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
         <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
@@ -50,9 +48,9 @@
       <div class="search-filter">
         <div class="search-bar">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search your listings...">
+          <input type="text" placeholder="Search your listings..." id="searchInput">
         </div>
-        <select class="status-filter">
+        <select class="status-filter" id="statusFilter">
           <option value="all">All Statuses</option>
           <option value="available">Available</option>
           <option value="pending">Pending</option>
@@ -64,7 +62,7 @@
       </button>
     </div>
 
-    <div class="listings-grid">
+    <div class="listings-grid" id="listingsGrid">
       <div class="listing-card">
         <div class="listing-badge available">Available</div>
         <div class="listing-image">
@@ -94,6 +92,9 @@
               <i class="fas fa-bolt"></i> Promote
             </button>
           </div>
+          <a href="pd.html?id=YOUR_PRODUCT_ID_HERE" class="view-details-btn">
+            <i class="fas fa-eye"></i> View Details
+          </a>
         </div>
       </div>
 
@@ -205,21 +206,19 @@
         <i class="fas fa-chevron-right"></i>
       </button>
     </div>
-    <!-- Example product card in listings.html -->
-<div class="listing-card">
-    <!-- ... other product card content ... -->
-    <a href="pd.html?id=YOUR_PRODUCT_ID_HERE" class="view-details-btn">
-        <i class="fas fa-eye"></i> View Details
-    </a>
-</div>
   </main>
   
-
-  <script>
-    function toggleProfileMenu() {
+  <script type="module">
+    import { initializeNavigation } from "./navigation.js";
+    import { initializeListingsPage } from "./listings.js";
+    import { auth } from "./firebase-config.js";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    
+    // Profile menu toggle
+    window.toggleProfileMenu = function() {
       const menu = document.getElementById("profileMenu");
       menu.classList.toggle("active");
-    }
+    };
 
     // Close profile menu when clicking outside
     document.addEventListener('click', function(event) {
@@ -230,13 +229,29 @@
       }
     });
 
+    // Initialize navigation with user data
+    initializeNavigation();
+    
+    // Initialize listings functionality
+    initializeListingsPage();
+
+    // Logout function
+    function logout() {
+        signOut(auth).then(() => {
+            window.location.href = "login.html";
+        }).catch((error) => {
+            console.error("Error signing out:", error);
+        });
+    }
+    window.logout = logout;
+
     // Status filter functionality
-    const statusFilter = document.querySelector('.status-filter');
-    const listingCards = document.querySelectorAll('.listing-card');
+    const statusFilter = document.getElementById('statusFilter');
+    const listingsGrid = document.getElementById('listingsGrid');
     
     statusFilter.addEventListener('change', function() {
       const status = this.value;
-      
+      const listingCards = listingsGrid.querySelectorAll('.listing-card');
       listingCards.forEach(card => {
         if (status === 'all') {
           card.style.display = 'flex';
@@ -247,28 +262,22 @@
       });
     });
 
-    // Delete listing confirmation
-    const deleteButtons = document.querySelectorAll('.btn-delete');
-    deleteButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
+    // Delete, mark sold, relist using event delegation
+    listingsGrid.addEventListener('click', function(e) {
+      // Delete listing confirmation
+      if (e.target.closest('.btn-delete')) {
         if (confirm('Are you sure you want to delete this listing?')) {
-          this.closest('.listing-card').style.display = 'none';
-          // Here you would typically make an API call to delete the listing
+          e.target.closest('.listing-card').style.display = 'none';
+          // API call to delete listing here
         }
-      });
-    });
-
-    // Mark as sold functionality
-    const markSoldButtons = document.querySelectorAll('.btn-mark-sold');
-    markSoldButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
-        const card = this.closest('.listing-card');
+      }
+      // Mark as sold functionality
+      if (e.target.closest('.btn-mark-sold')) {
+        const card = e.target.closest('.listing-card');
         const badge = card.querySelector('.listing-badge');
-        
         badge.classList.remove('pending');
         badge.classList.add('sold');
         badge.textContent = 'Sold';
-        
         // Change action buttons
         const actions = card.querySelector('.listing-actions');
         actions.innerHTML = `
@@ -279,8 +288,37 @@
             <i class="fas fa-trash"></i> Delete
           </button>
         `;
-        
-        // Here you would typically make an API call to update the listing status
+        // API call to update status here
+      }
+      // Relist functionality
+      if (e.target.closest('.btn-relist')) {
+        const card = e.target.closest('.listing-card');
+        const badge = card.querySelector('.listing-badge');
+        badge.classList.remove('sold');
+        badge.classList.add('available');
+        badge.textContent = 'Available';
+        // Change action buttons
+        const actions = card.querySelector('.listing-actions');
+        actions.innerHTML = `
+          <button class="btn-edit">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <button class="btn-promote">
+            <i class="fas fa-bolt"></i> Promote
+          </button>
+        `;
+        // API call to relist here
+      }
+    });
+
+    // Optional: Search filter
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase();
+      const listingCards = listingsGrid.querySelectorAll('.listing-card');
+      listingCards.forEach(card => {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = title.includes(query) ? 'flex' : 'none';
       });
     });
   </script>
