@@ -1,4 +1,4 @@
-// sell.js
+// sell.js (No Firebase Storage needed)
 import { auth, db } from "./firebase-config.js";
 import { ref, push, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -40,6 +40,9 @@ function setupFormSubmission() {
             
             const userData = userSnapshot.val();
             
+            // Convert images to Base64 (no storage needed)
+            const imageBase64Strings = await convertImagesToBase64();
+            
             // Prepare product data
             const productData = {
                 name: document.getElementById('product-name').value,
@@ -54,7 +57,7 @@ function setupFormSubmission() {
                 createdAt: Date.now(),
                 views: 0,
                 messages: 0,
-                images: await uploadImages() // This would handle image uploads
+                images: imageBase64Strings // Store as Base64 instead of URLs
             };
             
             // Save product to Firebase
@@ -83,24 +86,50 @@ function setupFormSubmission() {
     });
 }
 
-// Handle image uploads (simplified version - would need proper storage implementation)
-async function uploadImages() {
-    const imageUpload = document.getElementById('image-upload');
-    const files = imageUpload.files;
-    const imageUrls = [];
-    
-    // In a real implementation, you would upload to Firebase Storage
-    // For now, we'll just use placeholder URLs
-    for (let i = 0; i < files.length; i++) {
-        // Simulate upload delay
-        await new Promise(resolve => setTimeout(resolve, 100));
+// Convert images to Base64 strings
+function convertImagesToBase64() {
+    return new Promise((resolve, reject) => {
+        const imageUpload = document.getElementById('image-upload');
+        const files = imageUpload.files;
+        const base64Promises = [];
         
-        // Create a blob URL for preview (in real app, upload to Firebase Storage)
-        const blobUrl = URL.createObjectURL(files[i]);
-        imageUrls.push(blobUrl);
-    }
-    
-    return imageUrls;
+        if (files.length === 0) {
+            resolve([]);
+            return;
+        }
+        
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // Only process image files and limit size to 1MB to avoid large database entries
+            if (!file.type.startsWith('image/')) {
+                alert('Please upload only image files');
+                reject(new Error('Invalid file type'));
+                return;
+            }
+            
+            if (file.size > 1024 * 1024) { // 1MB limit
+                alert('Please upload images smaller than 1MB');
+                reject(new Error('File too large'));
+                return;
+            }
+            
+            const promise = new Promise((resolveFile, rejectFile) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    resolveFile(e.target.result); // This is the Base64 string
+                };
+                reader.onerror = (error) => rejectFile(error);
+                reader.readAsDataURL(file);
+            });
+            
+            base64Promises.push(promise);
+        }
+        
+        Promise.all(base64Promises)
+            .then(resolve)
+            .catch(reject);
+    });
 }
 
 // Make functions globally accessible
