@@ -1,6 +1,6 @@
-// listings.js
+// listings.js (with Base64 image support)
 import { auth, db } from "./firebase-config.js";
-import { ref, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { ref, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 let currentUser = null;
@@ -70,16 +70,23 @@ async function loadProductDetails(productId, listingInfo) {
     }
 }
 
-// Render product card
+// Render product card with Base64 images
 function renderProductCard(productId, productData, listingInfo) {
     const listingsGrid = document.querySelector('.listings-grid');
     
     const listingCard = document.createElement('div');
     listingCard.className = 'listing-card';
+    
+    // Get first image or use placeholder
+    const firstImage = productData.images && productData.images.length > 0 
+        ? productData.images[0] 
+        : 'https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80';
+    
     listingCard.innerHTML = `
         <div class="listing-badge ${productData.status || 'available'}">${productData.status || 'Available'}</div>
         <div class="listing-image">
-            <img src="${productData.images && productData.images.length > 0 ? productData.images[0] : 'https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'}" alt="${productData.name}">
+            <img src="${firstImage}" alt="${productData.name}" 
+                 onerror="this.src='https://images.unsplash.com/photo-1588514912908-8f5891714f8d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80'">
             ${productData.images ? `<div class="image-count"><i class="fas fa-camera"></i> ${productData.images.length}</div>` : ''}
         </div>
         <div class="listing-info">
@@ -123,105 +130,3 @@ function renderProductCard(productId, productData, listingInfo) {
     
     listingsGrid.appendChild(listingCard);
 }
-
-// Setup event listeners
-function setupEventListeners() {
-    // Status filter functionality
-    const statusFilter = document.querySelector('.status-filter');
-    statusFilter.addEventListener('change', function() {
-        const status = this.value;
-        const listingCards = document.querySelectorAll('.listing-card');
-        
-        listingCards.forEach(card => {
-            if (status === 'all') {
-                card.style.display = 'flex';
-            } else {
-                const cardStatus = card.querySelector('.listing-badge').textContent.toLowerCase();
-                card.style.display = cardStatus === status ? 'flex' : 'none';
-            }
-        });
-    });
-    
-    // Search functionality
-    const searchInput = document.querySelector('.search-bar input');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const listingCards = document.querySelectorAll('.listing-card');
-        
-        listingCards.forEach(card => {
-            const productName = card.querySelector('h3').textContent.toLowerCase();
-            const description = card.querySelector('.description').textContent.toLowerCase();
-            
-            if (productName.includes(searchTerm) || description.includes(searchTerm)) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    });
-}
-
-// Delete listing
-export async function deleteListing(productId) {
-    if (!confirm('Are you sure you want to delete this listing?')) return;
-    
-    try {
-        // Remove from user's listings
-        const userListingRef = ref(db, `users/${currentUser.uid}/listings/${productId}`);
-        await remove(userListingRef);
-        
-        // Also remove the product itself (optional - you might want to keep it for records)
-        const productRef = ref(db, `products/${productId}`);
-        await remove(productRef);
-        
-        alert('Listing deleted successfully!');
-    } catch (error) {
-        console.error("Error deleting listing:", error);
-        alert('Error deleting listing: ' + error.message);
-    }
-}
-
-// Mark as sold
-export async function markAsSold(productId) {
-    try {
-        const productRef = ref(db, `products/${productId}`);
-        await set(productRef, {
-            status: 'sold',
-            soldAt: Date.now()
-        }, { merge: true });
-        
-        alert('Product marked as sold!');
-    } catch (error) {
-        console.error("Error marking as sold:", error);
-        alert('Error marking as sold: ' + error.message);
-    }
-}
-
-// Relist product
-export async function relistProduct(productId) {
-    try {
-        const productRef = ref(db, `products/${productId}`);
-        await set(productRef, {
-            status: 'available',
-            soldAt: null
-        }, { merge: true });
-        
-        alert('Product relisted!');
-    } catch (error) {
-        console.error("Error relisting product:", error);
-        alert('Error relisting product: ' + error.message);
-    }
-}
-
-// Make functions globally accessible
-window.deleteListing = function(productId) {
-    deleteListing(productId);
-};
-
-window.markAsSold = function(productId) {
-    markAsSold(productId);
-};
-
-window.relistProduct = function(productId) {
-    relistProduct(productId);
-};
