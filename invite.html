@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Invite Friends - Student Crew</title>
+  <title>Invite Friends - TrustEd Market</title>
   <link rel="stylesheet" href="invite.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -23,7 +23,7 @@
 
   <div class="invite-container">
     <h1>🎉 Invite Your Friends</h1>
-    <p>Share Student Crew with your friends and earn <strong>💰 10 Coins</strong> for every signup using your referral link!</p>
+    <p>Share TrustEd Market with your friends and earn <strong>💰 10 Coins</strong> for every signup using your referral link!</p>
 
     <label for="referral">Your Referral Link:</label>
     <div class="referral-box">
@@ -69,12 +69,13 @@
       if (platform === "whatsapp") {
         link = `https://wa.me/?text=Join%20Student%20Crew%20and%20earn%20cool%20rewards!%20${encodeURIComponent(url)}`;
       } else if (platform === "telegram") {
-        link = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Join Student Crew and earn rewards!`;
+        link = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=Join TrustEd Market and earn rewards!`;
       } else if (platform === "email") {
-        link = `mailto:?subject=Join Student Crew!&body=Check this out: ${encodeURIComponent(url)}`;
+        link = `mailto:?subject=Join TrustEd Market!&body=Check this out: ${encodeURIComponent(url)}`;
       }
       window.open(link, "_blank");
     }
   </script>
 </body>
 </html>
+
